@@ -86,8 +86,8 @@ function createMainWindow() {
 function createOverlayWindow() {
   const { bounds } = screen.getPrimaryDisplay();
   overlayWindow = new BrowserWindow({
-    width: bounds.width + 10, height: bounds.height + 10,
-    x: bounds.x - 5, y: bounds.y - 5,
+    width: bounds.width + 10, height: bounds.height + 70,
+    x: bounds.x - 5, y: bounds.y - 30,
     transparent: true, frame: false, thickFrame: false, alwaysOnTop: true,
     skipTaskbar: true, hasShadow: false, title: '',
     backgroundColor: '#00000000',  // Transparent total, évite la barre DWM
