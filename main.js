@@ -1,6 +1,6 @@
 'use strict';
 
-const { app, BrowserWindow, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage } = require('electron');
 const { autoUpdater }     = require('electron-updater');
 const { Client, GatewayIntentBits } = require('discord.js');
 const Store = require('electron-store');
@@ -12,7 +12,22 @@ const store = new Store();
 let mainWindow    = null;
 let overlayWindow = null;
 let discordClient = null;
+let tray          = null;
+let forceQuit     = false;
 const mediaHistory = [];
+
+// ─── Migration depuis l'ancienne installation MemeDrop ───────────────────────
+function migrateFromOldInstall() {
+  if (store.has('token')) return;
+  try {
+    const oldCfg = path.join(os.homedir(), 'AppData', 'Roaming', 'memedrop', 'config.json');
+    if (fs.existsSync(oldCfg)) {
+      const old = JSON.parse(fs.readFileSync(oldCfg, 'utf8'));
+      ['token','channelId','discordUserId','volume','imageDuration','announceSound','randomPosition','selectedPosition']
+        .forEach(k => { if (old[k] !== undefined) store.set(k, old[k]); });
+    }
+  } catch (_) {}
+}
 
 // ─── Nettoyage fichiers temp au démarrage ────────────────────────────────────
 try {
@@ -80,12 +95,38 @@ function createMainWindow() {
     width: 520, height: 630,
     resizable: false,
     webPreferences: { nodeIntegration: true, contextIsolation: false },
-    title: 'MemeDrop',
+    title: 'MemeFlash',
     backgroundColor: '#1a1a1a',
   });
   mainWindow.loadFile(path.join(__dirname, 'src/config/index.html'));
   mainWindow.setMenuBarVisibility(false);
-  mainWindow.on('closed', () => { mainWindow = null; app.quit(); });
+  mainWindow.on('close', (e) => {
+    if (!forceQuit) {
+      e.preventDefault();
+      mainWindow.hide();
+      mainWindow.setSkipTaskbar(true);
+    }
+  });
+  mainWindow.on('closed', () => { mainWindow = null; });
+}
+
+// ─── System tray ──────────────────────────────────────────────────────────────
+function createTray() {
+  const iconPath = path.join(__dirname, 'build', 'icon.ico');
+  tray = new Tray(nativeImage.createFromPath(iconPath));
+  tray.setToolTip('MemeFlash');
+  const menu = Menu.buildFromTemplate([
+    {
+      label: 'Ouvrir MemeFlash',
+      click: () => { if (mainWindow) { mainWindow.show(); mainWindow.setSkipTaskbar(false); mainWindow.focus(); } },
+    },
+    { type: 'separator' },
+    { label: 'Quitter', click: () => app.quit() },
+  ]);
+  tray.setContextMenu(menu);
+  tray.on('click', () => {
+    if (mainWindow) { mainWindow.show(); mainWindow.setSkipTaskbar(false); mainWindow.focus(); }
+  });
 }
 
 // ─── Fenêtre overlay ──────────────────────────────────────────────────────────
@@ -295,8 +336,8 @@ ipcMain.on('test-overlay', () => {
     : store.get('selectedPosition', 'top');
   overlayWindow.webContents.send('show-media', {
     url: 'https://media.tenor.com/mCFONcUlBn8AAAAC/cat-typing.gif',
-    type: 'gif', text: "Test MemeDrop — l'overlay fonctionne !",
-    author: 'MemeDrop', position, platform: null,
+    type: 'gif', text: "Test MemeFlash — l'overlay fonctionne !",
+    author: 'MemeFlash', position, platform: null,
     volume: store.get('volume', 50) / 100,
     imageDuration: store.get('imageDuration', 8) * 1000,
     maxDuration: 30000,
@@ -304,7 +345,10 @@ ipcMain.on('test-overlay', () => {
   });
 });
 
-ipcMain.on('install-update', () => autoUpdater.quitAndInstall(false, true));
+let updateReady = false;
+ipcMain.on('install-update', () => {
+  if (updateReady) autoUpdater.quitAndInstall(false, true);
+});
 
 // ─── Auto-updater ─────────────────────────────────────────────────────────────
 function setupAutoUpdater() {
@@ -314,7 +358,11 @@ function setupAutoUpdater() {
   autoUpdater.on('update-available', (info) => {
     if (mainWindow) mainWindow.webContents.send('update-available', info.version);
   });
+  autoUpdater.on('download-progress', (p) => {
+    if (mainWindow) mainWindow.webContents.send('download-progress', Math.floor(p.percent));
+  });
   autoUpdater.on('update-downloaded', () => {
+    updateReady = true;
     if (mainWindow) mainWindow.webContents.send('update-downloaded');
   });
   autoUpdater.on('error', (e) => console.error('[Updater]', e.message));
@@ -323,14 +371,21 @@ function setupAutoUpdater() {
 
 // ─── Lifecycle ────────────────────────────────────────────────────────────────
 app.whenReady().then(() => {
+  migrateFromOldInstall();
   createMainWindow();
   createOverlayWindow();
+  createTray();
+  if (app.isPackaged) {
+    app.setLoginItemSettings({ openAtLogin: true, openAsHidden: false });
+  }
   const token = store.get('token', ''), channelId = store.get('channelId', '');
   if (token && channelId) startDiscordBot(token, channelId);
   setupAutoUpdater();
 });
 
-app.on('window-all-closed', () => {
-  if (discordClient) discordClient.destroy();
-  app.quit();
+app.on('before-quit', () => {
+  forceQuit = true;
+  if (discordClient) { discordClient.destroy(); discordClient = null; }
 });
+
+app.on('window-all-closed', () => { /* app vit dans le tray */ });

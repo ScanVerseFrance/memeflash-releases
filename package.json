@@ -1,6 +1,6 @@
 {
-  "name": "memedrop",
-  "version": "1.0.3",
+  "name": "memeflash",
+  "version": "1.0.4",
   "description": "Affiche les mèmes Discord en overlay pendant tes parties",
   "author": "MemeCorp",
   "main": "main.js",
@@ -21,15 +21,15 @@
     "sharp": "^0.34.5"
   },
   "build": {
-    "appId": "com.memecorp.memedrop",
-    "productName": "MemeDrop",
+    "appId": "com.memecorp.memeflash",
+    "productName": "MemeFlash",
     "copyright": "Copyright © 2025 MemeCorp",
     "icon": "build/icon.ico",
     "directories": { "output": "dist" },
     "publish": [{
       "provider": "github",
       "owner": "ScanVerseFrance",
-      "repo": "memedrop-releases"
+      "repo": "memeflash-releases"
     }],
     "win": {
       "target": [{ "target": "nsis", "arch": ["x64"] }]
@@ -39,7 +39,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "MemeDrop",
+      "shortcutName": "MemeFlash",
       "menuCategory": "MemeCorp",
       "include": "build/installer.nsh",
       "installerHeader": "build/header.bmp",
@@ -48,7 +48,9 @@
     "files": [
       "main.js",
       "src/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "build/icon.ico",
+      "build/icon.png"
     ]
   }
 }

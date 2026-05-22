@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MemeDrop</title>
+  <title>MemeFlash</title>
   <style>
     :root {
       --bg:      #1a1a1a;
@@ -243,13 +243,14 @@
     /* ── UPDATE BANNER ── */
     #update-banner {
       display: none;
-      align-items: center; gap: 10px;
+      flex-direction: column; gap: 6px;
       padding: 9px 16px;
       background: #2d5a27;
       border-bottom: 1px solid #3a7a32;
       font-size: 13px; flex-shrink: 0;
     }
     #update-banner.visible { display: flex; }
+    #update-banner .upd-row { display: flex; align-items: center; gap: 10px; width: 100%; }
     #update-banner .upd-dot { width: 7px; height: 7px; border-radius: 50%; background: #57f287; box-shadow: 0 0 5px #57f287; flex-shrink: 0; }
     #update-banner .upd-text { flex: 1; color: #c8f5c0; }
     #update-banner .upd-btn {
@@ -258,16 +259,25 @@
       padding: 5px 12px; cursor: pointer; white-space: nowrap;
     }
     #update-banner .upd-btn:hover { background: #45d470; }
-    #update-banner .upd-btn:disabled { opacity: .6; cursor: default; }
+    #upd-bar {
+      display: none; width: 100%; height: 4px;
+      -webkit-appearance: none; appearance: none;
+      border-radius: 2px; border: none; background: rgba(255,255,255,.15);
+    }
+    #upd-bar::-webkit-progress-value { background: #57f287; border-radius: 2px; }
+    #upd-bar::-webkit-progress-bar   { background: rgba(255,255,255,.15); border-radius: 2px; }
   </style>
 </head>
 <body>
 
   <!-- ─── UPDATE BANNER ──────────────────────────── -->
   <div id="update-banner">
-    <div class="upd-dot"></div>
-    <span class="upd-text" id="upd-text">Mise à jour disponible</span>
-    <button class="upd-btn" id="upd-btn">Installer et relancer</button>
+    <div class="upd-row">
+      <div class="upd-dot"></div>
+      <span class="upd-text" id="upd-text">Mise à jour disponible</span>
+      <button class="upd-btn" id="upd-btn">Installer et relancer</button>
+    </div>
+    <progress id="upd-bar" max="100" value="0"></progress>
   </div>
 
   <!-- ─── HEADER ─────────────────────────────────── -->
@@ -350,7 +360,7 @@
     <div class="save-area">
       <button class="btn-save" id="btn-save">Sauvegarder</button>
     </div>
-    <div class="footer">MemeDrop by MemeCorp — v1.0.3</div>
+    <div class="footer">MemeFlash by MemeCorp — v1.0.4</div>
   </div>
 
   <!-- ═══ PAGE : COMMANDES ═══════════════════════════════ -->
@@ -483,7 +493,7 @@
         </button>
       </div>
     </div>
-    <div class="footer">MemeDrop by MemeCorp — v1.0.3</div>
+    <div class="footer">MemeFlash by MemeCorp — v1.0.4</div>
   </div>
 
   <script src="renderer.js"></script>

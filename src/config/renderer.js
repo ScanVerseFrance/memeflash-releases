@@ -208,15 +208,26 @@ ipcRenderer.on('history-update', (_e, items) => {
 const updateBanner = document.getElementById('update-banner');
 const updText      = document.getElementById('upd-text');
 const updBtn       = document.getElementById('upd-btn');
+const updBar       = document.getElementById('upd-bar');
+let   updVersion   = '';
 
 ipcRenderer.on('update-available', (_e, version) => {
-  updText.textContent = `Mise à jour v${version} en cours de téléchargement…`;
+  updVersion = version;
+  updText.textContent = `Mise à jour v${version} — téléchargement…`;
   updateBanner.classList.add('visible');
-  updBtn.disabled = true;
+  updBtn.style.display = 'none';
+  if (updBar) { updBar.style.display = 'block'; updBar.value = 0; }
+});
+
+ipcRenderer.on('download-progress', (_e, percent) => {
+  updText.textContent = `Mise à jour v${updVersion} — ${percent}%`;
+  if (updBar) updBar.value = percent;
 });
 
 ipcRenderer.on('update-downloaded', () => {
-  updText.textContent = 'Mise à jour prête !';
+  updText.textContent = `v${updVersion} prête — cliquez pour installer`;
+  if (updBar) updBar.style.display = 'none';
+  updBtn.style.display = '';
   updBtn.disabled = false;
   updateBanner.classList.add('visible');
 });

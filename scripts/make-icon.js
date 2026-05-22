@@ -27,7 +27,7 @@ const HEADER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 57"
   <rect width="4" height="57" fill="#e05a28"/>
   <!-- M logo (polygon calculé à partir du logo 256px, mis à l'échelle 30×30 à x=10,y=13) -->
   <polygon points="12,44 12,14 19,14 27,29 35,14 42,14 42,44 37,44 37,27 31,37 23,37 17,27 17,44" fill="#e05a28"/>
-  <text x="52" y="27" font-family="Arial Black,Arial,sans-serif" font-size="16" font-weight="900" fill="white">MemeDrop</text>
+  <text x="52" y="27" font-family="Arial Black,Arial,sans-serif" font-size="16" font-weight="900" fill="white">MemeFlash</text>
   <text x="52" y="43" font-family="Arial,sans-serif" font-size="10" fill="#e05a28">by MemeCorp</text>
 </svg>`;
 
@@ -40,10 +40,10 @@ const SIDEBAR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 164 31
   <!-- Grand M centré (polygon calculé à partir du logo 256px, mis à l'échelle 120×115 à x=22,y=80) -->
   <polygon points="22,195 22,80 51,80 82,142 113,80 142,80 142,195 121,195 121,131 96,171 68,171 43,131 43,195" fill="#e05a28"/>
   <!-- Titre -->
-  <text x="82" y="228" font-family="Arial Black,Arial,sans-serif" font-size="19" font-weight="900" fill="white" text-anchor="middle">MemeDrop</text>
+  <text x="82" y="228" font-family="Arial Black,Arial,sans-serif" font-size="19" font-weight="900" fill="white" text-anchor="middle">MemeFlash</text>
   <text x="82" y="247" font-family="Arial,sans-serif" font-size="11" fill="#e05a28" text-anchor="middle">by MemeCorp</text>
   <!-- Version -->
-  <text x="82" y="295" font-family="Arial,sans-serif" font-size="10" fill="#444" text-anchor="middle">v1.0.3</text>
+  <text x="82" y="295" font-family="Arial,sans-serif" font-size="10" fill="#444" text-anchor="middle">v1.0.4</text>
 </svg>`;
 
 // ── ICO builder (multi-size PNG → .ico) ───────────────────────────────────────
