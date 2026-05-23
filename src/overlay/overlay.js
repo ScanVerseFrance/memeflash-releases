@@ -11,7 +11,11 @@ const progress  = document.getElementById('progress');
 const queueBadge= document.getElementById('queue-badge');
 const btnPause  = document.getElementById('btn-pause');
 const btnSkip   = document.getElementById('btn-skip');
+const btnLike   = document.getElementById('btn-like');
 const volCtrl   = document.getElementById('vol-ctrl');
+
+let currentMsgId  = null;
+let currentChanId = null;
 
 // ─── Queue ────────────────────────────────────────────────────────────────────
 const queue   = [];
@@ -79,10 +83,20 @@ volCtrl.addEventListener('input', () => {
 
 btnSkip.addEventListener('click', processNext);
 
+btnLike.addEventListener('click', async () => {
+  if (!currentMsgId || !currentChanId || btnLike.disabled) return;
+  btnLike.disabled = true;
+  const res = await ipcRenderer.invoke('react-message', {
+    channelId: currentChanId, messageId: currentMsgId, emoji: '❤️',
+  });
+  if (res?.ok) btnLike.classList.add('liked');
+  setTimeout(() => { btnLike.disabled = false; }, 800);
+});
+
 // ─── Affichage ────────────────────────────────────────────────────────────────
 let currentTempUrl = null;
 
-function displayMedia({ url, type, text, author, avatar: avatarUrl, position, platform, volume, imageDuration, maxDuration, announceSound }) {
+function displayMedia({ url, type, text, author, avatar: avatarUrl, position, platform, volume, imageDuration, maxDuration, announceSound, messageId, channelId }) {
   // Supprime le fichier temp de la vidéo précédente
   if (currentTempUrl) { ipcRenderer.send('delete-temp', currentTempUrl); currentTempUrl = null; }
   if (url?.startsWith('file:///')) currentTempUrl = url;
@@ -94,6 +108,12 @@ function displayMedia({ url, type, text, author, avatar: avatarUrl, position, pl
   paused = false;
   btnPause.innerHTML = PAUSE_SVG;
   volCtrl.value = volume ?? 0.5;
+
+  // Réinitialise le bouton like pour ce nouveau média
+  currentMsgId  = messageId  || null;
+  currentChanId = channelId  || null;
+  btnLike.classList.remove('liked');
+  btnLike.disabled = !currentMsgId;
 
   // Pause + volume uniquement pour les vidéos
   const isVideo = type === 'video';

@@ -1,6 +1,6 @@
 {
   "name": "memeflash",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Affiche les mèmes Discord en overlay pendant tes parties",
   "author": "MemeCorp",
   "main": "main.js",

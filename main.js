@@ -1,6 +1,6 @@
 'use strict';
 
-const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, shell } = require('electron');
 const { autoUpdater }     = require('electron-updater');
 const { Client, GatewayIntentBits } = require('discord.js');
 const Store = require('electron-store');
@@ -17,6 +17,10 @@ let tray          = null;
 let forceQuit     = false;
 let reconnectTimer = null;
 const mediaHistory = [];
+
+// ─── Démarrage caché (autostart Windows / macOS) ─────────────────────────────
+const startHidden = process.argv.includes('--hidden')
+  || app.getLoginItemSettings().wasOpenedAsHidden;
 
 // ─── Single instance lock ─────────────────────────────────────────────────────
 if (!app.requestSingleInstanceLock()) {
@@ -144,6 +148,8 @@ function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 520, height: 630,
     resizable: false,
+    show: !startHidden,
+    skipTaskbar: startHidden,
     webPreferences: { nodeIntegration: true, contextIsolation: false },
     title: 'MemeFlash',
     backgroundColor: '#1a1a1a',
@@ -325,6 +331,10 @@ function startDiscordBot(token, channelIds) {
       ? positions[Math.floor(Math.random() * positions.length)]
       : store.get('selectedPosition', 'top');
 
+    // URL source pour clic dans l'historique (TikTok/Twitter local → URL d'origine)
+    const sourceUrl = (text.match(/https?:\/\/\S+/) || [null])[0]
+      || (mediaUrl && /^https?:/.test(mediaUrl) ? mediaUrl : null);
+
     const payload = {
       url: mediaUrl, type: mediaType || 'text', text: displayText,
       author:   message.member?.displayName || message.author.globalName || message.author.username,
@@ -334,6 +344,8 @@ function startDiscordBot(token, channelIds) {
       imageDuration: store.get('imageDuration', 8) * 1000,
       maxDuration:   30000,
       announceSound: store.get('announceSound', false),
+      messageId:     message.id,
+      channelId:     message.channelId,
     };
 
     if (overlayWindow) {
@@ -345,6 +357,10 @@ function startDiscordBot(token, channelIds) {
       url: mediaUrl, type: mediaType, text,
       author: message.author.username,
       platform,
+      messageId: message.id,
+      channelId: message.channelId,
+      sourceUrl,
+      liked: false,
       timestamp: new Date().toISOString(),
     });
     if (mediaHistory.length > 50) mediaHistory.pop();
@@ -422,6 +438,33 @@ ipcMain.on('delete-temp', (_e, fileUrl) => {
   try { fs.unlink(fileURLToPath(fileUrl), () => {}); } catch (_) {}
 });
 
+// Ouvre une URL dans le navigateur par défaut (clic sur item d'historique)
+ipcMain.on('open-external', (_e, url) => {
+  if (!url || typeof url !== 'string') return;
+  if (!/^https?:\/\//.test(url)) return;   // bloque file://, javascript:, etc.
+  shell.openExternal(url).catch(() => {});
+});
+
+// Ajoute une réaction ❤️ sur le message Discord d'origine
+ipcMain.handle('react-message', async (_e, { channelId, messageId, emoji }) => {
+  if (!discordClient || !channelId || !messageId) return { ok: false, error: 'not_connected' };
+  try {
+    const channel = await discordClient.channels.fetch(channelId);
+    const message = await channel.messages.fetch(messageId);
+    await message.react(emoji || '❤️');
+    // Marque l'item comme liké dans l'historique
+    const item = mediaHistory.find(m => m.messageId === messageId);
+    if (item) {
+      item.liked = true;
+      if (mainWindow) mainWindow.webContents.send('history-update', mediaHistory);
+    }
+    return { ok: true };
+  } catch (err) {
+    console.error('[React]', err.message);
+    return { ok: false, error: err.message };
+  }
+});
+
 ipcMain.on('test-overlay', () => {
   if (!overlayWindow) return;
   const positions = ['top-left','top','top-right','bottom-left','center','bottom-right'];
@@ -437,6 +480,7 @@ ipcMain.on('test-overlay', () => {
     imageDuration: store.get('imageDuration', 8) * 1000,
     maxDuration: 30000,
     announceSound: store.get('announceSound', false),
+    messageId: null, channelId: null,
   });
 });
 
@@ -476,7 +520,11 @@ app.whenReady().then(() => {
   createOverlayWindow();
   createTray();
   if (app.isPackaged) {
-    app.setLoginItemSettings({ openAtLogin: true });
+    app.setLoginItemSettings({
+      openAtLogin: true,
+      openAsHidden: true,         // macOS
+      args: ['--hidden'],         // Windows : passé au lancement par le système
+    });
   }
   app.on('activate', showMainWindow);
   const token = store.get('token', '');

@@ -151,9 +151,14 @@
       width: 30px; height: 30px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; flex-shrink: 0;
-      transition: background .15s;
+      transition: background .15s, color .15s, border-color .15s;
     }
     .ctrl-btn:hover { background: rgba(255,255,255,.25); }
+    .ctrl-btn.liked {
+      color: #ed4245; border-color: rgba(237,66,69,.6);
+      background: rgba(237,66,69,.15);
+    }
+    .ctrl-btn:disabled { opacity: .4; cursor: default; }
 
     #vol-ctrl {
       flex: 1;
@@ -206,6 +211,9 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
           </button>
           <input type="range" id="vol-ctrl" min="0" max="1" step="0.05" value="0.5" />
+          <button class="ctrl-btn" id="btn-like" title="J'aime (réaction Discord)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+          </button>
           <button class="ctrl-btn" id="btn-skip">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>

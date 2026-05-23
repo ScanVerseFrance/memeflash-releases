@@ -239,27 +239,60 @@ function setStatus(text, state) {
 }
 
 // ─── Historique ───────────────────────────────────────────────────────────────
+const HEART_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2.5 4.5-9.5 9-9.5 9z"/></svg>`;
+const LINK_SVG  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+
 ipcRenderer.on('history-update', (_e, items) => {
   if (!items.length) {
     historyList.innerHTML = '<div class="empty-state">Aucun média reçu pour le moment</div>';
     return;
   }
-  historyList.innerHTML = items.map(item => {
+  historyList.innerHTML = items.map((item, idx) => {
     const time      = relativeTime(new Date(item.timestamp));
     const typeLabel = item.type === 'video' ? 'Vidéo' : item.type === 'gif' ? 'GIF' : 'Image';
     const thumb     = item.type !== 'video'
       ? `<img class="history-thumb" src="${escAttr(item.url)}" alt="" onerror="this.style.opacity=0" />`
       : `<div class="history-thumb" style="display:flex;align-items:center;justify-content:center;">${VID_ICON}</div>`;
+    const hasLink  = !!item.sourceUrl;
+    const canReact = !!item.messageId;
     return `
-      <div class="history-item">
+      <div class="history-item" data-idx="${idx}">
         ${thumb}
         <div class="h-info">
           <div class="h-author">${escHtml(item.author)}</div>
           <div class="h-time">${time}</div>
         </div>
         <span class="h-type">${typeLabel}</span>
+        ${canReact ? `<button class="h-btn h-like ${item.liked ? 'liked' : ''}" data-action="like" data-idx="${idx}" title="J'aime (réaction Discord)">${HEART_SVG}</button>` : ''}
+        ${hasLink ? `<button class="h-btn" data-action="open" data-idx="${idx}" title="Ouvrir le lien">${LINK_SVG}</button>` : ''}
       </div>`;
   }).join('');
+  currentHistory = items;
+});
+
+let currentHistory = [];
+
+historyList.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.h-btn');
+  if (!btn) return;
+  e.stopPropagation();
+  const idx  = parseInt(btn.dataset.idx, 10);
+  const item = currentHistory[idx];
+  if (!item) return;
+
+  if (btn.dataset.action === 'open' && item.sourceUrl) {
+    ipcRenderer.send('open-external', item.sourceUrl);
+    return;
+  }
+  if (btn.dataset.action === 'like' && item.messageId) {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const res = await ipcRenderer.invoke('react-message', {
+      channelId: item.channelId, messageId: item.messageId, emoji: '❤️',
+    });
+    if (res?.ok) btn.classList.add('liked');
+    setTimeout(() => { btn.disabled = false; }, 800);
+  }
 });
 
 // ─── Auto-updater ────────────────────────────────────────────────────────────

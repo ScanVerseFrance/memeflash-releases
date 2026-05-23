@@ -43,7 +43,7 @@ const SIDEBAR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 164 31
   <text x="82" y="228" font-family="Arial Black,Arial,sans-serif" font-size="19" font-weight="900" fill="white" text-anchor="middle">MemeFlash</text>
   <text x="82" y="247" font-family="Arial,sans-serif" font-size="11" fill="#e05a28" text-anchor="middle">by MemeCorp</text>
   <!-- Version -->
-  <text x="82" y="295" font-family="Arial,sans-serif" font-size="10" fill="#444" text-anchor="middle">v1.0.16</text>
+  <text x="82" y="295" font-family="Arial,sans-serif" font-size="10" fill="#444" text-anchor="middle">v1.0.17</text>
 </svg>`;
 
 // ── ICO builder (multi-size PNG → .ico) ───────────────────────────────────────

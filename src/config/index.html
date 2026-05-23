@@ -203,6 +203,19 @@
     .h-author { font-size: 13px; font-weight: 600; }
     .h-time   { font-size: 11px; color: var(--muted); }
     .h-type   { font-size: 11px; padding: 2px 7px; border-radius: 3px; background: var(--surface2); color: var(--muted); flex-shrink:0; }
+    .h-btn {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); border-radius: 4px;
+      width: 28px; height: 26px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s;
+    }
+    .h-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .h-btn:disabled { opacity: .5; cursor: default; }
+    .h-btn.liked, .h-like.liked {
+      color: #ed4245; border-color: rgba(237,66,69,.5); background: rgba(237,66,69,.1);
+    }
+    .h-btn.liked:hover { color: #ed4245; border-color: #ed4245; }
 
     .empty-state { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0; }
 
@@ -405,7 +418,7 @@
     <div class="save-area">
       <button class="btn-save" id="btn-save">Sauvegarder</button>
     </div>
-    <div class="footer">MemeFlash by MemeCorp — v1.0.16</div>
+    <div class="footer">MemeFlash by MemeCorp — v1.0.17</div>
   </div>
 
   <!-- ═══ PAGE : COMMANDES ═══════════════════════════════ -->
@@ -539,7 +552,7 @@
         </button>
       </div>
     </div>
-    <div class="footer">MemeFlash by MemeCorp — v1.0.16</div>
+    <div class="footer">MemeFlash by MemeCorp — v1.0.17</div>
   </div>
 
   <!-- ═══ PAGE : AIDE ═══════════════════════════════════════ -->
