@@ -9,6 +9,7 @@
     "make-icon": "node scripts/make-icon.js",
     "build": "npm run make-icon && electron-builder --win --x64",
     "release": "npm run make-icon && electron-builder --win --x64 --publish always",
+    "build-mac": "npm run make-icon && electron-builder --mac --publish never",
     "release-mac": "npm run make-icon && electron-builder --mac --publish always"
   },
   "dependencies": {

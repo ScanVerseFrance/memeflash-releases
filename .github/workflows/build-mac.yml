@@ -24,7 +24,7 @@ jobs:
         run: npm ci
 
       - name: Build macOS DMG
-        run: npm run make-icon && electron-builder --mac --publish never
+        run: npm run build-mac
 
       - name: Upload DMG to release
         run: |
