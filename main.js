@@ -347,7 +347,7 @@ ipcMain.on('test-overlay', () => {
 
 let updateReady = false;
 ipcMain.on('install-update', () => {
-  if (updateReady) autoUpdater.quitAndInstall(false, true);
+  if (updateReady) autoUpdater.quitAndInstall(true, true);
 });
 
 // ─── Auto-updater ─────────────────────────────────────────────────────────────

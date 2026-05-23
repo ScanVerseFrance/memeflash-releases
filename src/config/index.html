@@ -266,6 +266,40 @@
     }
     #upd-bar::-webkit-progress-value { background: #57f287; border-radius: 2px; }
     #upd-bar::-webkit-progress-bar   { background: rgba(255,255,255,.15); border-radius: 2px; }
+
+    /* ── GUIDE / AIDE ── */
+    .guide-step {
+      display: flex; gap: 12px; padding: 12px 0;
+      border-bottom: 1px solid var(--border); align-items: flex-start;
+    }
+    .step-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 900; flex-shrink: 0; margin-top: 1px;
+    }
+    .step-title { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+    .step-desc  { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .step-desc strong { color: var(--text); font-weight: 600; }
+    .step-desc a  { color: var(--accent); text-decoration: none; cursor: pointer; }
+    .step-desc a:hover { text-decoration: underline; }
+    .step-desc ul { margin: 5px 0 0 16px; }
+    .step-desc li { margin-bottom: 3px; }
+    .step-warn { color: #faa61a; font-weight: 600; }
+    .fmt-grid  { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .fmt-badge {
+      padding: 4px 10px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 14px;
+      font-size: 11px; color: var(--muted);
+    }
+    .guide-links { display: flex; gap: 8px; margin-top: 4px; }
+    .guide-link-btn {
+      flex: 1; padding: 9px; text-align: center;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--muted);
+      font-size: 12px; text-decoration: none; cursor: pointer; transition: all .15s;
+    }
+    .guide-link-btn:hover { border-color: var(--accent); color: var(--accent); }
   </style>
 </head>
 <body>
@@ -302,6 +336,7 @@
     <button class="tab"        data-tab="commands">Commandes</button>
     <button class="tab"        data-tab="history">Historique</button>
     <button class="tab"        data-tab="account">Compte</button>
+    <button class="tab"        data-tab="help">Aide</button>
   </div>
 
   <!-- ═══ PAGE : RÉGLAGES ════════════════════════════════ -->
@@ -360,7 +395,7 @@
     <div class="save-area">
       <button class="btn-save" id="btn-save">Sauvegarder</button>
     </div>
-    <div class="footer">MemeFlash by MemeCorp — v1.0.4</div>
+    <div class="footer">MemeFlash by MemeCorp — v1.0.5</div>
   </div>
 
   <!-- ═══ PAGE : COMMANDES ═══════════════════════════════ -->
@@ -493,7 +528,102 @@
         </button>
       </div>
     </div>
-    <div class="footer">MemeFlash by MemeCorp — v1.0.4</div>
+    <div class="footer">MemeFlash by MemeCorp — v1.0.5</div>
+  </div>
+
+  <!-- ═══ PAGE : AIDE ═══════════════════════════════════════ -->
+  <div class="page" id="page-help">
+    <div class="page-scroll">
+
+      <div class="sec">Configuration (1 seule fois)</div>
+
+      <div class="guide-step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Créer un bot Discord</div>
+          <div class="step-desc">
+            Ouvre <a class="ext-link" href="https://discord.com/developers/applications">discord.com/developers</a>
+            → <strong>New Application</strong> → nomme-le → onglet <strong>Bot</strong> :
+            <ul>
+              <li>Clique <strong>Reset Token</strong> → copie le token</li>
+              <li>Active <strong>Message Content Intent</strong> <span class="step-warn">(obligatoire !)</span></li>
+              <li>Active aussi <strong>Server Members Intent</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Ajouter le bot à ton serveur</div>
+          <div class="step-desc">
+            Onglet <strong>OAuth2 → URL Generator</strong> :<br/>
+            Coche <strong>bot</strong>, puis <strong>Read Messages/View Channels</strong>
+            + <strong>Read Message History</strong>.<br/>
+            Ouvre le lien généré et ajoute le bot à ton serveur.
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Activer le mode développeur Discord</div>
+          <div class="step-desc">
+            Discord → <strong>Paramètres → Avancé → Mode développeur ✓</strong><br/>
+            Ensuite clic droit sur le salon → <strong>Copier l'identifiant</strong> = Channel ID.
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Connecter dans MemeFlash</div>
+          <div class="step-desc">
+            Onglet <strong>Compte</strong> → colle le <strong>Token</strong> et le <strong>Channel ID</strong>
+            → clique <strong>Connecter</strong>.<br/>
+            Le point vert confirme la connexion.
+          </div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="sec">Utilisation</div>
+
+      <div class="guide-step">
+        <div class="step-num">▶</div>
+        <div class="step-body">
+          <div class="step-title">Envoyer un mème</div>
+          <div class="step-desc">
+            Dans le salon Discord configuré, <strong>ping l'utilisateur</strong> + envoie un média.<br/>
+            <em>Ex : <strong>@Pseudo</strong> + image / lien TikTok / lien Twitter…</em><br/>
+            <strong>@everyone</strong> fonctionne aussi pour tout le monde.
+          </div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="sec">Formats supportés</div>
+      <div class="fmt-grid">
+        <span class="fmt-badge">Image JPG / PNG</span>
+        <span class="fmt-badge">GIF animé</span>
+        <span class="fmt-badge">Vidéo MP4 / WebM</span>
+        <span class="fmt-badge">TikTok</span>
+        <span class="fmt-badge">Twitter / X</span>
+        <span class="fmt-badge">Tenor / Giphy</span>
+        <span class="fmt-badge">Texte seul</span>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="guide-links">
+        <a class="ext-link guide-link-btn" href="https://github.com/ScanVerseFrance/memeflash-releases">GitHub</a>
+        <a class="ext-link guide-link-btn" href="https://github.com/ScanVerseFrance/memeflash-releases/releases/latest">Télécharger</a>
+        <a class="ext-link guide-link-btn" href="https://discord.com/developers/applications">Dev Portal</a>
+      </div>
+
+    </div>
   </div>
 
   <script src="renderer.js"></script>
