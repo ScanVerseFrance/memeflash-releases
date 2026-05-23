@@ -164,6 +164,9 @@ function createOverlayWindow() {
     webPreferences: { nodeIntegration: true, contextIsolation: false, backgroundThrottling: false },
   });
   overlayWindow.setAlwaysOnTop(true, 'screen-saver');
+  if (process.platform === 'darwin') {
+    overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  }
   overlayWindow.setIgnoreMouseEvents(true, { forward: true });
   overlayWindow.setSkipTaskbar(true);
   overlayWindow.removeMenu();
