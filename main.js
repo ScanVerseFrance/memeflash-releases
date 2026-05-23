@@ -115,6 +115,29 @@ async function getTwitterMedia(url) {
   return null;
 }
 
+// ─── Détection Streamable ────────────────────────────────────────────────────
+function isStreamableUrl(url) {
+  return /^https?:\/\/(www\.)?streamable\.com\/[a-z0-9]+/i.test(url);
+}
+
+async function getStreamableMedia(url) {
+  try {
+    const id = url.match(/streamable\.com\/([a-z0-9]+)/i)?.[1];
+    if (!id) return null;
+    const ctrl = new AbortController();
+    const tid  = setTimeout(() => ctrl.abort(), 8000);
+    const res  = await fetch(`https://api.streamable.com/videos/${id}`,
+      { headers: { 'User-Agent': 'MemeFlash/1.0' }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const u    = data.files?.mp4?.url;
+    if (!u) return null;
+    return { url: u.startsWith('//') ? `https:${u}` : u, type: 'video' };
+  } catch (e) { console.error('[Streamable]', e.message); }
+  return null;
+}
+
 // ─── Fenêtre de configuration ────────────────────────────────────────────────
 function createMainWindow() {
   mainWindow = new BrowserWindow({
@@ -239,8 +262,14 @@ function startDiscordBot(token, channelIds) {
     // (pas la vidéo directe). On laisse le step 3 gérer ces cas via leurs extracteurs.
     if (!mediaUrl && message.embeds.length > 0) {
       const embed = message.embeds[0];
-      if (embed.video?.url && !isTwitterUrl(embed.video.url) && !isTikTokUrl(embed.video.url)) {
-        mediaUrl = embed.video.proxyURL || embed.video.url; mediaType = 'video';
+      if (embed.video?.url && !isTwitterUrl(embed.video.url) && !isTikTokUrl(embed.video.url) && !isStreamableUrl(embed.video.url)) {
+        // embed.video.proxyURL en /embeds/ = page HTML Discord, pas un flux vidéo direct
+        const proxy = embed.video.proxyURL;
+        if (proxy && !proxy.includes('/embeds/')) {
+          mediaUrl = proxy; mediaType = 'video';
+        } else if (/\.(mp4|webm|ogg)(\?|#|$)/i.test(embed.video.url)) {
+          mediaUrl = embed.video.url; mediaType = 'video';
+        }
       }
       if (!mediaUrl && embed.image?.url) {
         const u = embed.image.url.toLowerCase();
@@ -262,6 +291,9 @@ function startDiscordBot(token, channelIds) {
         } else if (isTwitterUrl(url)) {
           const r = await getTwitterMedia(url);
           if (r) { mediaUrl = r.url; mediaType = r.type; platform = 'twitter'; break; }
+        } else if (isStreamableUrl(url)) {
+          const r = await getStreamableMedia(url);
+          if (r) { mediaUrl = r.url; mediaType = r.type; break; }
         } else {
           const m = url.match(/\.(jpe?g|png|gif|webp|mp4|webm)(\?.*)?$/i);
           if (m) {

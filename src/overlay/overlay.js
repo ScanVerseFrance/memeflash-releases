@@ -18,6 +18,7 @@ const queue   = [];
 let playing   = false;
 let hideTimer = null;
 let emptyTimer = null;
+let loadTimer = null;
 let paused    = false;
 
 const PAUSE_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
@@ -158,22 +159,26 @@ function buildVideo(url, volume, maxDur) {
   video.loop     = false;
   video.volume   = Math.min(1, Math.max(0, volume));
 
+  // Si la vidéo ne démarre pas dans les 10s (codec non supporté, URL invalide…), on passe au suivant
+  loadTimer = setTimeout(() => { loadTimer = null; processNext(); }, 10000);
+
   video.addEventListener('loadedmetadata', () => {
+    clearTimeout(loadTimer); loadTimer = null;
     const totalMs   = video.duration * 1000;
-    const displayMs = Math.min(totalMs, maxDur);
+    const displayMs = isFinite(totalMs) ? Math.min(totalMs, maxDur) : maxDur;
     startProgress(displayMs);
-    if (totalMs > maxDur) {
+    if (!isFinite(totalMs) || totalMs > maxDur) {
       hideTimer = setTimeout(processNext, maxDur);
     }
   });
 
   video.addEventListener('ended', processNext);
-  video.addEventListener('error', () => { hideTimer = setTimeout(processNext, 2000); });
+  video.addEventListener('error', () => { clearTimeout(loadTimer); loadTimer = null; processNext(); });
   video.addEventListener('pause', () => { if (!paused) video.play().catch(() => {}); });
 
   video.play().catch(() => {
     video.muted = true;
-    video.play().catch(processNext);
+    video.play().catch(() => { clearTimeout(loadTimer); loadTimer = null; processNext(); });
   });
 
   mediaWrap.appendChild(video);
@@ -260,6 +265,7 @@ function doHide() {
 }
 
 function stopMedia() {
+  clearTimeout(loadTimer); loadTimer = null;
   const video = mediaWrap.querySelector('video');
   if (video) { video.pause(); video.src = ''; video.load(); }
   mediaWrap.innerHTML = '';
