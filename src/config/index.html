@@ -30,111 +30,127 @@
       flex-direction: column;
     }
 
-    /* ── HEADER ── */
     .header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px;
       background: var(--surface);
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
       -webkit-app-region: drag;
     }
     .header * { -webkit-app-region: no-drag; }
-
     #avatar-el {
-      width: 46px; height: 46px;
-      border-radius: 50%;
+      width: 42px; height: 42px; border-radius: 50%;
       background: #c0392b;
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px; font-weight: 700; color: #fff;
-      flex-shrink: 0;
-      overflow: hidden;
+      font-size: 18px; font-weight: 700; color: #fff;
+      flex-shrink: 0; overflow: hidden;
     }
-
     .user-info { flex: 1; min-width: 0; }
-    #username-el { font-size: 15px; font-weight: 700; line-height: 1.2; }
-    .user-sub    { font-size: 12px; color: var(--muted); line-height: 1.6; }
-    #token-preview { font-family: monospace; font-size: 11px; color: #555; }
-
+    #username-el { font-size: 14px; font-weight: 700; line-height: 1.2; }
+    .user-sub    { font-size: 11px; color: var(--muted); line-height: 1.6; }
+    #token-preview { font-family: monospace; font-size: 10px; color: #555; }
     .btn-disconnect {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 7px 14px;
-      border-radius: var(--radius);
-      font-size: 13px; cursor: pointer;
-      transition: all .15s; white-space: nowrap;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); padding: 6px 12px; border-radius: var(--radius);
+      font-size: 12px; cursor: pointer; transition: all .15s; white-space: nowrap;
     }
     .btn-disconnect:hover { border-color: #e74c3c; color: #e74c3c; }
 
-    /* ── CHANNEL BAR ── */
     .channel-bar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 9px 16px;
+      padding: 7px 16px;
       background: var(--surface2);
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
-    .channel-lbl { font-size: 13px; color: var(--accent); font-weight: 600; }
+    .channel-lbl { font-size: 12px; color: var(--accent); font-weight: 600; }
     .channel-lbl span { color: var(--text); }
     .btn-reconfig {
       background: transparent; border: 1px solid var(--border);
-      color: var(--muted); padding: 5px 12px;
-      border-radius: var(--radius); font-size: 12px; cursor: pointer;
+      color: var(--muted); padding: 4px 10px;
+      border-radius: var(--radius); font-size: 11px; cursor: pointer;
       transition: all .15s;
     }
     .btn-reconfig:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* ── TABS ── */
     .tabs {
       display: flex;
       background: var(--surface);
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
+      overflow-x: auto;
     }
+    .tabs::-webkit-scrollbar { height: 0; }
     .tab {
-      flex: 1; padding: 11px 4px;
-      text-align: center; font-size: 13px; font-weight: 500;
+      flex: 1; padding: 10px 6px; min-width: 64px;
+      text-align: center; font-size: 12px; font-weight: 500;
       cursor: pointer; color: var(--muted);
       border: none; background: transparent;
       transition: all .15s;
+      white-space: nowrap;
     }
     .tab.active { background: var(--accent); color: #fff; font-weight: 700; }
     .tab:not(.active):hover { color: var(--text); background: var(--surface2); }
 
-    /* ── TAB PAGES ── */
     .page { display: none; flex-direction: column; flex: 1; overflow: hidden; }
     .page.active { display: flex; }
 
-    .page-scroll { flex: 1; overflow-y: auto; padding: 16px; }
+    .page-scroll { flex: 1; overflow-y: auto; padding: 14px 16px; }
     .page-scroll::-webkit-scrollbar { width: 5px; }
     .page-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* ── SECTION LABELS ── */
     .sec {
-      font-size: 11px; font-weight: 800; letter-spacing: .1em;
+      font-size: 10px; font-weight: 800; letter-spacing: .1em;
       color: var(--accent); text-transform: uppercase;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .sec + .sec, .spacer { margin-top: 18px; }
 
-    /* ── SETTING ROW ── */
-    .row {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
+    /* ── CARD (groupe de paramètres) ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 14px 6px;
+      margin-bottom: 12px;
     }
-    .row-label { font-size: 14px; }
-    .row-sub   { font-size: 12px; color: var(--muted); margin-top: 1px; }
-    .row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-    .row-val   { font-size: 13px; color: var(--muted); min-width: 32px; text-align: right; }
+    .card-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 700; color: var(--text);
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title .ico {
+      width: 24px; height: 24px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(224,90,40,.12);
+      color: var(--accent);
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .card-title .ico svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .card-title .ico svg.fill { fill: currentColor; stroke: none; }
+    .card-title small {
+      margin-left: auto; font-weight: 400;
+      font-size: 10px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .06em;
+    }
+    .card .row:last-child { margin-bottom: 8px; }
 
-    /* ── SLIDER ── */
+    .row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px; gap: 8px;
+    }
+    .row-label { font-size: 13px; flex: 1; min-width: 0; }
+    .row-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .row-val   { font-size: 12px; color: var(--muted); min-width: 30px; text-align: right; }
+
     input[type="range"] {
       -webkit-appearance: none; appearance: none;
-      width: 140px; height: 4px;
+      width: 130px; height: 4px;
       border-radius: 2px; outline: none; cursor: pointer;
       background: linear-gradient(to right, var(--accent) 0%, var(--border) 0%);
     }
@@ -144,7 +160,6 @@
       background: var(--accent); cursor: pointer;
     }
 
-    /* ── TOGGLE ── */
     .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
     .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
     .toggle-track {
@@ -162,115 +177,128 @@
     .toggle input:checked + .toggle-track { background: var(--accent); }
     .toggle input:checked + .toggle-track::after { transform: translateX(20px); }
 
-    /* ── POSITION GRID ── */
     .pos-grid {
-      display: grid; grid-template-columns: 1fr 1fr 1fr;
-      gap: 6px; margin-top: 4px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;
+      margin-top: 4px;
+      background: rgba(0,0,0,.2);
+      border-radius: 8px;
+      padding: 5px;
     }
     .pos-btn {
-      padding: 10px 6px; background: var(--surface2);
-      border: 1px solid var(--border); border-radius: var(--radius);
-      color: var(--muted); font-size: 13px; font-weight: 500;
+      padding: 12px 4px; background: var(--surface2);
+      border: 1px solid transparent; border-radius: 6px;
+      color: var(--muted); font-size: 11px; font-weight: 500;
       cursor: pointer; transition: all .15s; text-align: center;
+      letter-spacing: .01em;
     }
-    .pos-btn:hover:not(.active) { border-color: var(--accent); color: var(--text); }
-    .pos-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+    .pos-btn:hover:not(.active) { background: #333; color: var(--text); }
+    .pos-btn.active {
+      background: var(--accent); border-color: var(--accent);
+      color: #fff; font-weight: 700;
+      box-shadow: 0 0 12px rgba(224,90,40,.4);
+    }
     .pos-btn:disabled { opacity: .35; cursor: default; pointer-events: none; }
 
-    /* ── SAVE BUTTON ── */
-    .save-area { padding: 12px 16px 8px; flex-shrink: 0; }
+    .save-area { padding: 10px 16px 8px; flex-shrink: 0; }
     .btn-save {
-      width: 100%; padding: 13px;
+      width: 100%; padding: 12px;
       background: var(--accent); border: none; border-radius: var(--radius);
-      color: #fff; font-size: 15px; font-weight: 700;
+      color: #fff; font-size: 14px; font-weight: 700;
       cursor: pointer; letter-spacing: .04em; transition: background .15s;
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .btn-save:hover { background: var(--accent2); }
+    .btn-save.secondary { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+    .btn-save.secondary:hover { border-color: var(--accent); }
 
-    .footer { text-align: center; font-size: 11px; color: #444; padding: 6px 0 10px; }
+    .footer { text-align: center; font-size: 10px; color: #444; padding: 4px 0 8px; }
 
-    /* ── HISTORY ── */
+    /* ── HISTORIQUE / FAVORIS ── */
     .history-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 0; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
     }
     .history-thumb {
-      width: 54px; height: 38px; object-fit: cover;
+      width: 50px; height: 36px; object-fit: cover;
       border-radius: 4px; background: var(--surface2); flex-shrink: 0;
     }
     .h-info { flex: 1; min-width: 0; }
-    .h-author { font-size: 13px; font-weight: 600; }
-    .h-time   { font-size: 11px; color: var(--muted); }
-    .h-type   { font-size: 11px; padding: 2px 7px; border-radius: 3px; background: var(--surface2); color: var(--muted); flex-shrink:0; }
-    .h-btn {
+    .h-author { font-size: 12px; font-weight: 600; }
+    .h-time   { font-size: 10px; color: var(--muted); }
+    .h-actions { display: flex; gap: 3px; align-items: center; flex-shrink: 0; }
+
+    .h-react-btn, .h-btn {
       background: transparent; border: 1px solid var(--border);
-      color: var(--muted); border-radius: 4px;
-      width: 28px; height: 26px; flex-shrink: 0;
+      border-radius: 4px;
+      height: 26px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: all .15s;
+      font-size: 13px; line-height: 1;
+      color: var(--muted);
     }
-    .h-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
-    .h-btn:disabled { opacity: .5; cursor: default; }
-    .h-btn.liked, .h-like.liked {
-      color: #ed4245; border-color: rgba(237,66,69,.5); background: rgba(237,66,69,.1);
+    .h-react-btn { width: 26px; padding: 0; }
+    .h-btn       { width: 26px; padding: 0; }
+    .h-react-btn:hover:not(:disabled),
+    .h-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); transform: scale(1.05); }
+    .h-react-btn.used { background: rgba(237,66,69,.15); border-color: rgba(237,66,69,.5); }
+    .h-btn:disabled, .h-react-btn:disabled { opacity: .5; cursor: default; }
+    .h-btn.faved { color: #faa61a; border-color: rgba(250,166,26,.5); }
+
+    .empty-state { text-align: center; color: var(--muted); font-size: 12px; padding: 32px 0; }
+
+    /* ── COMPTE / FILTRES ── */
+    .field { margin-bottom: 12px; }
+    .field label {
+      display: block; font-size: 11px; color: var(--muted);
+      margin-bottom: 4px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
     }
-    .h-btn.liked:hover { color: #ed4245; border-color: #ed4245; }
-
-    .empty-state { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0; }
-
-    /* ── COMMANDES ── */
-    .cmd-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); align-items: center; }
-    .cmd-icon { width: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--accent); }
-    .cmd-name { font-size: 14px; font-weight: 700; color: var(--accent); font-family: monospace; }
-    .cmd-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-    /* ── COMPTE ── */
-    .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
-    .field-hint { font-size: 11px; color: #555; text-transform: none; letter-spacing: 0; font-weight: 400; }
-    .field input {
+    .field-hint { font-size: 10px; color: #555; text-transform: none; letter-spacing: 0; font-weight: 400; }
+    .field input, .field select {
       width: 100%; background: var(--surface2);
       border: 1px solid var(--border); border-radius: var(--radius);
-      color: var(--text); font-size: 13px; padding: 9px 12px; outline: none;
+      color: var(--text); font-size: 12px; padding: 8px 10px; outline: none;
       transition: border-color .15s;
+      font-family: inherit;
     }
-    .field input:focus { border-color: var(--accent); }
-    .field-row-btn { display: flex; gap: 8px; margin-top: 4px; }
+    .field input:focus, .field select:focus { border-color: var(--accent); }
+    .field-row-btn { display: flex; gap: 6px; margin-top: 4px; }
     .channel-entry { display: flex; gap: 6px; margin-bottom: 6px; }
     .channel-entry input { flex: 1; }
-    .btn-remove-ch {
+    .btn-remove-ch, .btn-remove-item {
       background: transparent; border: 1px solid var(--border);
       color: var(--muted); border-radius: var(--radius);
-      width: 34px; font-size: 18px; line-height: 1; cursor: pointer;
+      width: 32px; font-size: 16px; line-height: 1; cursor: pointer;
       transition: all .15s; flex-shrink: 0;
     }
-    .btn-remove-ch:hover { border-color: #e74c3c; color: #e74c3c; }
+    .btn-remove-ch:hover, .btn-remove-item:hover { border-color: #e74c3c; color: #e74c3c; }
     .btn-sm {
-      flex: 1; padding: 8px; background: transparent;
+      flex: 1; padding: 7px; background: transparent;
       border: 1px solid var(--border); border-radius: var(--radius);
-      color: var(--muted); font-size: 12px; cursor: pointer; transition: all .15s;
-      display: flex; align-items: center; justify-content: center; gap: 5px;
+      color: var(--muted); font-size: 11px; cursor: pointer; transition: all .15s;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
     }
     .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
     .btn-sm svg, .btn-save svg { flex-shrink: 0; }
 
-    /* Status dot */
-    .status-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--surface2); border-radius: var(--radius); margin-bottom: 14px; font-size: 13px; }
+    .status-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px;
+      background: var(--surface2); border-radius: var(--radius);
+      margin-bottom: 12px; font-size: 12px;
+    }
     .sdot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
     .sdot.online  { background: #57f287; box-shadow: 0 0 6px #57f287; }
     .sdot.error   { background: #ed4245; }
     .sdot.loading { background: #faa61a; animation: blink 1s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    /* ── UPDATE BANNER ── */
     #update-banner {
       display: none;
       flex-direction: column; gap: 6px;
-      padding: 9px 16px;
+      padding: 8px 16px;
       background: #2d5a27;
       border-bottom: 1px solid #3a7a32;
-      font-size: 13px; flex-shrink: 0;
+      font-size: 12px; flex-shrink: 0;
     }
     #update-banner.visible { display: flex; }
     #update-banner .upd-row { display: flex; align-items: center; gap: 10px; width: 100%; }
@@ -278,66 +306,136 @@
     #update-banner .upd-text { flex: 1; color: #c8f5c0; }
     #update-banner .upd-btn {
       background: #57f287; border: none; border-radius: 5px;
-      color: #111; font-size: 12px; font-weight: 700;
-      padding: 5px 12px; cursor: pointer; white-space: nowrap;
+      color: #111; font-size: 11px; font-weight: 700;
+      padding: 5px 10px; cursor: pointer; white-space: nowrap;
     }
     #update-banner .upd-btn:hover { background: #45d470; }
-    #upd-bar {
-      display: none; width: 100%; height: 4px;
-      -webkit-appearance: none; appearance: none;
-      border-radius: 2px; border: none; background: rgba(255,255,255,.15);
-    }
-    #upd-bar::-webkit-progress-value { background: #57f287; border-radius: 2px; }
-    #upd-bar::-webkit-progress-bar   { background: rgba(255,255,255,.15); border-radius: 2px; }
 
-    /* ── GUIDE / AIDE ── */
+    /* ── THÈMES ── */
+    .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .theme-swatch {
+      height: 40px; border-radius: 6px; cursor: pointer;
+      border: 2px solid transparent; transition: all .15s;
+      position: relative;
+    }
+    .theme-swatch:hover { transform: scale(1.05); }
+    .theme-swatch.selected { border-color: #fff; box-shadow: 0 0 12px currentColor; }
+    .theme-orange { background: #e05a28; color: #e05a28; }
+    .theme-pink   { background: #ee1d8a; color: #ee1d8a; }
+    .theme-green  { background: #57f287; color: #57f287; }
+    .theme-purple { background: #9b59ff; color: #9b59ff; }
+    .theme-blue   { background: #1d9bf0; color: #1d9bf0; }
+
+    /* ── SNOOZE / HOTKEYS / OBS ── */
+    .snooze-display {
+      padding: 10px 12px; background: rgba(250,166,26,.1);
+      border: 1px solid rgba(250,166,26,.4); border-radius: var(--radius);
+      color: #faa61a; font-size: 12px; margin-bottom: 10px;
+      display: none; align-items: center; gap: 8px;
+    }
+    .snooze-display.visible { display: flex; }
+    .snooze-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+      margin-bottom: 8px;
+    }
+    .snooze-btn {
+      padding: 8px 4px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      color: var(--muted); font-size: 11px; cursor: pointer; transition: all .15s;
+    }
+    .snooze-btn:hover { border-color: #faa61a; color: #faa61a; }
+
+    .hotkey-list {
+      background: rgba(0,0,0,.25);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 4px 10px;
+      font-size: 11px; color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .hotkey-list div {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 0;
+    }
+    .hotkey-list div + div { border-top: 1px solid var(--border); }
+    .hotkey-list kbd {
+      background: #111; border: 1px solid var(--border); border-radius: 4px;
+      padding: 2px 8px; font-size: 10px; font-family: 'Consolas', monospace;
+      color: var(--accent); font-weight: 600;
+      box-shadow: 0 1px 0 rgba(0,0,0,.4);
+    }
+
+    .obs-url {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 8px 10px;
+      font-family: monospace; font-size: 11px; color: var(--accent);
+      cursor: text; user-select: text;
+      word-break: break-all;
+    }
+
+    /* ── BADGES BLACKLIST / KEYWORDS ── */
+    .chip-list { display: flex; flex-wrap: wrap; gap: 5px; min-height: 32px; padding: 4px 0; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 4px 8px 4px 10px;
+      font-size: 11px; color: var(--text);
+    }
+    .chip button {
+      background: transparent; border: none; color: var(--muted);
+      cursor: pointer; font-size: 14px; line-height: 1;
+      padding: 0 2px; transition: color .15s;
+    }
+    .chip button:hover { color: #e74c3c; }
+    .chip-empty { font-size: 11px; color: var(--muted); padding: 4px 0; }
+
+    /* ── STATS ── */
+    .stat-bar { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .stat-rank { width: 22px; text-align: center; font-weight: 700; color: var(--muted); font-size: 11px; }
+    .stat-name { flex: 1; font-size: 12px; font-weight: 600; }
+    .stat-count { font-size: 11px; color: var(--accent); font-weight: 700; min-width: 30px; text-align: right; }
+    .stat-track { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; flex: 2; }
+    .stat-fill { height: 100%; background: var(--accent); }
+
+    /* ── GUIDE ── */
     .guide-step {
-      display: flex; gap: 12px; padding: 12px 0;
+      display: flex; gap: 12px; padding: 10px 0;
       border-bottom: 1px solid var(--border); align-items: flex-start;
     }
     .step-num {
-      width: 26px; height: 26px; border-radius: 50%;
+      width: 24px; height: 24px; border-radius: 50%;
       background: var(--accent); color: #fff;
       display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 900; flex-shrink: 0; margin-top: 1px;
+      font-size: 11px; font-weight: 900; flex-shrink: 0; margin-top: 1px;
     }
-    .step-title { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
-    .step-desc  { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .step-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .step-desc  { font-size: 11px; color: var(--muted); line-height: 1.55; }
     .step-desc strong { color: var(--text); font-weight: 600; }
     .step-desc a  { color: var(--accent); text-decoration: none; cursor: pointer; }
     .step-desc a:hover { text-decoration: underline; }
-    .step-desc ul { margin: 5px 0 0 16px; }
+    .step-desc ul { margin: 4px 0 0 16px; }
     .step-desc li { margin-bottom: 3px; }
     .step-warn { color: #faa61a; font-weight: 600; }
-    .fmt-grid  { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-    .fmt-badge {
-      padding: 4px 10px; background: var(--surface2);
-      border: 1px solid var(--border); border-radius: 14px;
-      font-size: 11px; color: var(--muted);
-    }
-    .guide-links { display: flex; gap: 8px; margin-top: 4px; }
+    .guide-links { display: flex; gap: 6px; margin-top: 4px; }
     .guide-link-btn {
-      flex: 1; padding: 9px; text-align: center;
+      flex: 1; padding: 8px; text-align: center;
       background: var(--surface2); border: 1px solid var(--border);
       border-radius: var(--radius); color: var(--muted);
-      font-size: 12px; text-decoration: none; cursor: pointer; transition: all .15s;
+      font-size: 11px; text-decoration: none; cursor: pointer; transition: all .15s;
     }
     .guide-link-btn:hover { border-color: var(--accent); color: var(--accent); }
   </style>
 </head>
 <body>
 
-  <!-- ─── UPDATE BANNER ──────────────────────────── -->
   <div id="update-banner">
     <div class="upd-row">
       <div class="upd-dot"></div>
       <span class="upd-text" id="upd-text">Mise à jour disponible</span>
       <button class="upd-btn" id="upd-btn">Installer et relancer</button>
     </div>
-    <progress id="upd-bar" max="100" value="0"></progress>
   </div>
 
-  <!-- ─── HEADER ─────────────────────────────────── -->
   <div class="header">
     <div id="avatar-el">?</div>
     <div class="user-info">
@@ -347,162 +445,254 @@
     <button class="btn-disconnect" id="btn-disconnect">Déconnexion</button>
   </div>
 
-  <!-- ─── CHANNEL BAR ────────────────────────────── -->
   <div class="channel-bar">
-    <span class="channel-lbl">Channel écoute : <span id="channel-display">—</span></span>
+    <span class="channel-lbl">Channel : <span id="channel-display">—</span></span>
     <button class="btn-reconfig" id="btn-reconfig">Reconfigurer</button>
   </div>
 
-  <!-- ─── TABS ───────────────────────────────────── -->
   <div class="tabs">
     <button class="tab active" data-tab="settings">Réglages</button>
-    <button class="tab"        data-tab="commands">Commandes</button>
-    <button class="tab"        data-tab="history">Historique</button>
-    <button class="tab"        data-tab="account">Compte</button>
-    <button class="tab"        data-tab="help">Aide</button>
+    <button class="tab" data-tab="appearance">Apparence</button>
+    <button class="tab" data-tab="filters">Filtres</button>
+    <button class="tab" data-tab="history">Histo</button>
+    <button class="tab" data-tab="favorites">Favoris</button>
+    <button class="tab" data-tab="stats">Stats</button>
+    <button class="tab" data-tab="account">Compte</button>
+    <button class="tab" data-tab="help">Aide</button>
   </div>
 
-  <!-- ═══ PAGE : RÉGLAGES ════════════════════════════════ -->
+  <!-- ═══ RÉGLAGES ═══════════════════════════════════════ -->
   <div class="page active" id="page-settings">
     <div class="page-scroll">
 
-      <div class="sec">Audio</div>
-      <div class="row">
-        <span class="row-label">Volume vidéos</span>
-        <div class="row-right">
-          <span class="row-val" id="vol-lbl">50%</span>
-          <input type="range" id="vol" min="0" max="100" value="50" />
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></span> Audio</div>
+        <div class="row">
+          <span class="row-label">Volume vidéos</span>
+          <div class="row-right">
+            <span class="row-val" id="vol-lbl">50%</span>
+            <input type="range" id="vol" min="0" max="100" value="50" />
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <span class="row-label">Son d'annonce</span>
-        <label class="toggle">
-          <input type="checkbox" id="chk-announce" />
-          <div class="toggle-track"></div>
-        </label>
-      </div>
-
-      <div class="spacer"></div>
-      <div class="sec">Durée</div>
-      <div class="row">
-        <span class="row-label">Durée des images</span>
-        <div class="row-right">
-          <span class="row-val" id="dur-lbl">8s</span>
-          <input type="range" id="dur" min="2" max="30" value="8" />
+        <div class="row">
+          <span class="row-label">Son d'annonce <span class="row-sub" style="display:block">Bip court quand un mème arrive</span></span>
+          <label class="toggle"><input type="checkbox" id="chk-announce" /><div class="toggle-track"></div></label>
         </div>
       </div>
 
-      <div class="spacer"></div>
-      <div class="sec">Position</div>
-      <div class="row" style="margin-bottom:10px">
-        <div>
-          <div class="row-label">Position aléatoire</div>
-          <div class="row-sub">Apparaît à un endroit différent à chaque fois</div>
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Durée &amp; position</div>
+        <div class="row">
+          <span class="row-label">Durée des images</span>
+          <div class="row-right">
+            <span class="row-val" id="dur-lbl">8s</span>
+            <input type="range" id="dur" min="2" max="30" value="8" />
+          </div>
         </div>
-        <label class="toggle">
-          <input type="checkbox" id="chk-random" />
-          <div class="toggle-track"></div>
-        </label>
+        <div class="row" style="margin-bottom:10px">
+          <div>
+            <div class="row-label">Position aléatoire</div>
+            <div class="row-sub">À chaque mème, un coin différent</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="chk-random" /><div class="toggle-track"></div></label>
+        </div>
+        <div class="pos-grid" id="pos-grid">
+          <button class="pos-btn" data-pos="top-left">haut gauche</button>
+          <button class="pos-btn active" data-pos="top">haut</button>
+          <button class="pos-btn" data-pos="top-right">haut droite</button>
+          <button class="pos-btn" data-pos="bottom-left">bas gauche</button>
+          <button class="pos-btn" data-pos="center">centre</button>
+          <button class="pos-btn" data-pos="bottom-right">bas droite</button>
+        </div>
       </div>
 
-      <div class="pos-grid" id="pos-grid">
-        <button class="pos-btn" data-pos="top-left">haut gauche</button>
-        <button class="pos-btn active" data-pos="top">haut</button>
-        <button class="pos-btn" data-pos="top-right">haut droite</button>
-        <button class="pos-btn" data-pos="bottom-left">bas gauche</button>
-        <button class="pos-btn" data-pos="center">centre</button>
-        <button class="pos-btn" data-pos="bottom-right">bas droite</button>
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"/></svg></span> Raccourcis clavier <small>fonctionnent même en jeu</small></div>
+        <div class="row">
+          <span class="row-label">Activer les raccourcis globaux</span>
+          <label class="toggle"><input type="checkbox" id="chk-hotkeys" checked /><div class="toggle-track"></div></label>
+        </div>
+        <div class="hotkey-list">
+          <div><span>Skip mème actuel</span> <kbd>Ctrl+Shift+M</kbd></div>
+          <div><span>Cacher l'overlay</span> <kbd>Ctrl+Shift+H</kbd></div>
+          <div><span>Rejouer le dernier</span> <kbd>Ctrl+Shift+R</kbd></div>
+          <div><span>Like (❤️) le mème</span> <kbd>Ctrl+Shift+L</kbd></div>
+          <div><span>Snooze 15 min</span> <kbd>Ctrl+Shift+B</kbd></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span> OBS Browser Source <small>pour streamers</small></div>
+        <div class="row">
+          <div>
+            <div class="row-label">Activer le serveur</div>
+            <div class="row-sub">Diffuse l'overlay vers OBS via http</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="chk-obs" /><div class="toggle-track"></div></label>
+        </div>
+        <div class="row">
+          <span class="row-label">Port</span>
+          <div class="row-right">
+            <input type="number" id="obs-port" value="7777" min="1024" max="65535"
+              style="width:90px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;padding:6px 8px;text-align:center;font-family:monospace;" />
+          </div>
+        </div>
+        <div id="obs-url-box" style="display:none;margin-bottom:6px">
+          <div class="row-sub" style="margin-bottom:4px">URL à coller dans OBS → Source &gt; Navigateur :</div>
+          <div class="obs-url" id="obs-url">http://127.0.0.1:7777/</div>
+        </div>
       </div>
 
     </div>
     <div class="save-area">
       <button class="btn-save" id="btn-save">Sauvegarder</button>
     </div>
-    <div class="footer">MemeFlash by MemeCorp — v1.0.18</div>
+    <div class="footer">MemeFlash by MemeCorp — v1.1.0</div>
   </div>
 
-  <!-- ═══ PAGE : COMMANDES ═══════════════════════════════ -->
-  <div class="page" id="page-commands">
+  <!-- ═══ APPARENCE ══════════════════════════════════════ -->
+  <div class="page" id="page-appearance">
     <div class="page-scroll">
-      <div class="sec">Médias détectés</div>
 
-      <div class="cmd-item">
-        <div class="cmd-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 22a10 10 0 1 1 8.71-5.16A2 2 0 0 0 19 20H17a2 2 0 0 0-2 2v0z"/></svg></span> Thème <small>couleur d'accent</small></div>
+        <div class="theme-grid" id="theme-grid">
+          <div class="theme-swatch theme-orange" data-theme="orange" title="Orange"></div>
+          <div class="theme-swatch theme-pink"   data-theme="pink"   title="Rose"></div>
+          <div class="theme-swatch theme-green"  data-theme="green"  title="Vert"></div>
+          <div class="theme-swatch theme-purple" data-theme="purple" title="Violet"></div>
+          <div class="theme-swatch theme-blue"   data-theme="blue"   title="Bleu"></div>
         </div>
-        <div><div class="cmd-name">Image / GIF</div><div class="cmd-desc">JPG, PNG, WEBP, GIF uploadés ou en lien direct</div></div>
+        <div class="row-sub" style="margin-top:8px;padding-bottom:4px">Les vidéos TikTok / X / Reddit gardent les couleurs de leur plateforme.</div>
       </div>
 
-      <div class="cmd-item">
-        <div class="cmd-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></span> Mise en page de l'overlay</div>
+        <div class="row">
+          <span class="row-label">Taille de la carte</span>
+          <div class="row-right">
+            <span class="row-val" id="size-lbl">100%</span>
+            <input type="range" id="size" min="50" max="150" value="100" />
+          </div>
         </div>
-        <div><div class="cmd-name">Vidéo</div><div class="cmd-desc">MP4, WEBM uploadés ou en lien direct — 30s max, son automatique</div></div>
+        <div class="row">
+          <span class="row-label">Animation d'entrée</span>
+          <select id="anim" style="width:150px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;padding:6px 8px;">
+            <option value="pop">Pop (défaut)</option>
+            <option value="slide">Slide</option>
+            <option value="fade">Fade</option>
+            <option value="bounce">Bounce</option>
+            <option value="none">Aucune</option>
+          </select>
+        </div>
+        <div class="row">
+          <span class="row-label">Écran cible</span>
+          <select id="display-select" style="width:240px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;padding:6px 8px;">
+            <option value="0">Chargement…</option>
+          </select>
+        </div>
       </div>
 
-      <div class="cmd-item">
-        <div class="cmd-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="6" x2="6" y2="18"/><line x1="18" y1="6" x2="18" y2="18"/><line x1="2" y1="10" x2="6" y2="10"/><line x1="18" y1="10" x2="22" y2="10"/><line x1="2" y1="14" x2="6" y2="14"/><line x1="18" y1="14" x2="22" y2="14"/></svg>
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></span> Mode streamer <small>masque pour tes viewers</small></div>
+        <div class="row">
+          <div>
+            <div class="row-label">Flouter les médias</div>
+            <div class="row-sub">Images et vidéos floutées (audio OK)</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="chk-streamer" /><div class="toggle-track"></div></label>
         </div>
-        <div><div class="cmd-name">Tenor / Giphy</div><div class="cmd-desc">GIFs animés via embed Discord (type gifv)</div></div>
+        <div class="row">
+          <div>
+            <div class="row-label">Masquer les pseudos</div>
+            <div class="row-sub">Remplace le nom par "Anonyme"</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="chk-streamer-names" /><div class="toggle-track"></div></label>
+        </div>
+        <div class="row">
+          <div>
+            <div class="row-label">Flouter les avatars</div>
+            <div class="row-sub">Brouille les photos de profil</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="chk-streamer-avatars" /><div class="toggle-track"></div></label>
+        </div>
       </div>
 
-      <div class="cmd-item">
-        <div class="cmd-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+    </div>
+    <div class="save-area">
+      <button class="btn-save" id="btn-save-app">Sauvegarder</button>
+    </div>
+  </div>
+
+  <!-- ═══ FILTRES ════════════════════════════════════════ -->
+  <div class="page" id="page-filters">
+    <div class="page-scroll">
+
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><path d="M13.73 21a2 2 0 0 1-3.46 0M18.63 13A17.89 17.89 0 0 1 18 8M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14M18 8a6 6 0 0 0-9.33-5"/><line x1="1" y1="1" x2="23" y2="23"/></svg></span> Snooze <small>silence temporaire</small></div>
+        <div class="snooze-display" id="snooze-display">
+          <span id="snooze-text">Snooze actif</span>
         </div>
-        <div><div class="cmd-name">Liens bruts</div><div class="cmd-desc">URL se terminant par .jpg .gif .mp4 .webm dans le texte du message</div></div>
+        <div class="snooze-grid">
+          <button class="snooze-btn" data-minutes="5">5 min</button>
+          <button class="snooze-btn" data-minutes="15">15 min</button>
+          <button class="snooze-btn" data-minutes="30">30 min</button>
+          <button class="snooze-btn" data-minutes="60">1 h</button>
+          <button class="snooze-btn" data-minutes="120">2 h</button>
+        </div>
+        <button class="btn-sm" id="btn-snooze-cancel" style="width:100%;margin-bottom:10px">Annuler le snooze</button>
+        <div class="row">
+          <div>
+            <div class="row-label">Laisser passer @everyone</div>
+            <div class="row-sub">Les pings collectifs ignorent le snooze</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="chk-snooze-everyone" /><div class="toggle-track"></div></label>
+        </div>
       </div>
 
-      <div class="cmd-item">
-        <div class="cmd-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></span> Cooldown par user <small>anti-spam individuel</small></div>
+        <div class="row">
+          <span class="row-label">Délai entre 2 mèmes du même user</span>
+          <div class="row-right">
+            <span class="row-val" id="cd-lbl">0s</span>
+            <input type="range" id="cd" min="0" max="300" value="0" />
+          </div>
         </div>
-        <div><div class="cmd-name">TikTok</div><div class="cmd-desc">Lien TikTok → vidéo extraite et affichée directement (via tikwm.com)</div></div>
+        <div class="row-sub" style="padding-bottom:4px">0 = pas de cooldown. Au-delà, les messages trop rapides sont ignorés.</div>
       </div>
 
-      <div class="cmd-item">
-        <div class="cmd-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> Anti-raid</div>
+        <div class="row">
+          <div>
+            <div class="row-label">Bloquer si &gt; 5 mèmes en 10s</div>
+            <div class="row-sub">Évite les rafales pendant un raid</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="chk-antiraid" /><div class="toggle-track"></div></label>
         </div>
-        <div><div class="cmd-name">X / Twitter</div><div class="cmd-desc">Lien de tweet → image ou vidéo extraite (via fxtwitter)</div></div>
       </div>
 
-      <div class="spacer"></div>
-      <div class="sec">Comportement</div>
-
-      <div class="cmd-item">
-        <div class="cmd-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
-        <div><div class="cmd-name">Durée image</div><div class="cmd-desc">Réglable dans Réglages → Durée (2 à 30 s)</div></div>
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="18" y1="8" x2="23" y2="13"/><line x1="23" y1="8" x2="18" y2="13"/></svg></span> Utilisateurs blacklistés</div>
+        <div class="chip-list" id="blacklist-chips"><span class="chip-empty">Aucun. Blackliste un user depuis l'historique.</span></div>
       </div>
 
-      <div class="cmd-item">
-        <div class="cmd-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-7 1-4 7z"/></svg>
+      <div class="card">
+        <div class="card-title"><span class="ico"><svg viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg></span> Mots-clés bloqués</div>
+        <div class="field" style="margin-bottom:8px;">
+          <div class="field-row-btn">
+            <input type="text" id="keyword-input" placeholder="Mot à bloquer…" style="flex:1" />
+            <button class="btn-sm" id="btn-add-keyword" style="flex:0 0 auto;padding:7px 14px">Ajouter</button>
+          </div>
         </div>
-        <div><div class="cmd-name">Click-through</div><div class="cmd-desc">L'overlay n'intercepte pas ta souris pendant les parties</div></div>
-      </div>
-
-      <div class="cmd-item">
-        <div class="cmd-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-        </div>
-        <div><div class="cmd-name">Always on Top</div><div class="cmd-desc">Affiché par-dessus les fenêtres en mode borderless windowed</div></div>
-      </div>
-
-      <div class="cmd-item">
-        <div class="cmd-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <div><div class="cmd-name">Ciblage par ping</div><div class="cmd-desc">Pingue un utilisateur dans le message → seul son overlay affichera le média</div></div>
+        <div class="chip-list" id="keyword-chips"><span class="chip-empty">Aucun mot bloqué.</span></div>
       </div>
 
     </div>
   </div>
 
-  <!-- ═══ PAGE : HISTORIQUE ══════════════════════════════ -->
+  <!-- ═══ HISTORIQUE ═════════════════════════════════════ -->
   <div class="page" id="page-history">
     <div class="page-scroll">
       <div id="history-list">
@@ -511,7 +701,29 @@
     </div>
   </div>
 
-  <!-- ═══ PAGE : COMPTE ══════════════════════════════════ -->
+  <!-- ═══ FAVORIS ════════════════════════════════════════ -->
+  <div class="page" id="page-favorites">
+    <div class="page-scroll">
+      <div id="favorites-list">
+        <div class="empty-state">Aucun favori. Clique sur ⭐ dans l'historique pour en ajouter.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STATS ══════════════════════════════════════════ -->
+  <div class="page" id="page-stats">
+    <div class="page-scroll">
+      <div class="sec">Top contributeurs</div>
+      <div id="stats-list">
+        <div class="empty-state">Aucune stat. Les compteurs s'incrémentent à chaque mème reçu.</div>
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn-sm" id="btn-stats-reset" style="width:100%">Réinitialiser les stats</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ COMPTE ═════════════════════════════════════════ -->
   <div class="page" id="page-account">
     <div class="page-scroll">
       <div class="status-row">
@@ -523,55 +735,46 @@
         <label>Token du Bot</label>
         <input type="password" id="ac-token" placeholder="MTxxxxxxxx.Gxxxx.xxxx" autocomplete="off" spellcheck="false" />
         <div class="field-row-btn" style="margin-top:6px">
-          <button class="btn-sm" id="btn-show-token">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            Afficher
-          </button>
-          <button class="btn-sm" id="btn-test">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v4L4 17a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1L16 7V3"/><line x1="8" y1="3" x2="16" y2="3"/></svg>
-            Tester l'overlay
-          </button>
+          <button class="btn-sm" id="btn-show-token">Afficher</button>
+          <button class="btn-sm" id="btn-test">Tester l'overlay</button>
         </div>
       </div>
 
       <div class="field">
         <label>Channel ID(s)</label>
         <div id="channel-list"></div>
-        <button class="btn-sm" id="btn-add-channel" style="margin-top:8px;width:100%;">+ Ajouter un salon</button>
+        <button class="btn-sm" id="btn-add-channel" style="margin-top:6px;width:100%;">+ Ajouter un salon</button>
       </div>
 
       <div class="field">
-        <label>Mon Discord ID <span class="field-hint">(optionnel — pour le ciblage par ping)</span></label>
+        <label>Mon Discord ID <span class="field-hint">(optionnel — ciblage par ping)</span></label>
         <input type="text" id="ac-discord-id" placeholder="000000000000000000" />
       </div>
 
       <div class="save-area" style="padding: 4px 0 0;">
-        <button class="btn-save" id="btn-connect">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8H6a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2z"/></svg>
-          Connecter
-        </button>
+        <button class="btn-save" id="btn-connect">Connecter</button>
       </div>
     </div>
-    <div class="footer">MemeFlash by MemeCorp — v1.0.18</div>
+    <div class="footer">MemeFlash by MemeCorp — v1.1.0</div>
   </div>
 
-  <!-- ═══ PAGE : AIDE ═══════════════════════════════════════ -->
+  <!-- ═══ AIDE ══════════════════════════════════════════════ -->
   <div class="page" id="page-help">
     <div class="page-scroll">
 
-      <div class="sec">Configuration (1 seule fois)</div>
+      <div class="sec">Configuration (1 fois)</div>
 
       <div class="guide-step">
         <div class="step-num">1</div>
-        <div class="step-body">
+        <div>
           <div class="step-title">Créer un bot Discord</div>
           <div class="step-desc">
             Ouvre <a class="ext-link" href="https://discord.com/developers/applications">discord.com/developers</a>
-            → <strong>New Application</strong> → nomme-le → onglet <strong>Bot</strong> :
+            → <strong>New Application</strong> → onglet <strong>Bot</strong> :
             <ul>
-              <li>Clique <strong>Reset Token</strong> → copie le token</li>
-              <li>Active <strong>Message Content Intent</strong> <span class="step-warn">(obligatoire !)</span></li>
-              <li>Active aussi <strong>Server Members Intent</strong></li>
+              <li>Clique <strong>Reset Token</strong> → copie</li>
+              <li>Active <strong>Message Content Intent</strong> <span class="step-warn">(obligatoire)</span></li>
+              <li>Active <strong>Server Members Intent</strong></li>
             </ul>
           </div>
         </div>
@@ -579,65 +782,42 @@
 
       <div class="guide-step">
         <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-title">Ajouter le bot à ton serveur</div>
+        <div>
+          <div class="step-title">Ajouter le bot au serveur</div>
           <div class="step-desc">
-            Onglet <strong>OAuth2 → URL Generator</strong> :<br/>
-            Coche <strong>bot</strong>, puis <strong>Read Messages/View Channels</strong>
-            + <strong>Read Message History</strong>.<br/>
-            Ouvre le lien généré et ajoute le bot à ton serveur.
+            Onglet <strong>OAuth2 → URL Generator</strong> : coche <strong>bot</strong>
+            puis <strong>Read Messages</strong> + <strong>Add Reactions</strong>.
           </div>
         </div>
       </div>
 
       <div class="guide-step">
         <div class="step-num">3</div>
-        <div class="step-body">
-          <div class="step-title">Activer le mode développeur Discord</div>
+        <div>
+          <div class="step-title">Récupérer le Channel ID</div>
           <div class="step-desc">
-            Discord → <strong>Paramètres → Avancé → Mode développeur ✓</strong><br/>
-            Ensuite clic droit sur le salon → <strong>Copier l'identifiant</strong> = Channel ID.
+            Discord → <strong>Paramètres → Avancé → Mode développeur</strong>, puis clic droit sur un salon → <strong>Copier l'identifiant</strong>.
           </div>
         </div>
       </div>
 
       <div class="guide-step">
         <div class="step-num">4</div>
-        <div class="step-body">
-          <div class="step-title">Connecter dans MemeFlash</div>
+        <div>
+          <div class="step-title">Configuration OBS (optionnel)</div>
           <div class="step-desc">
-            Onglet <strong>Compte</strong> → colle le <strong>Token</strong> et le <strong>Channel ID</strong>
-            → clique <strong>Connecter</strong>.<br/>
-            Le point vert confirme la connexion.
+            Active le serveur dans Réglages, puis dans OBS : <strong>+ Source → Navigateur</strong>,
+            colle <code style="background:#111;padding:1px 4px">http://127.0.0.1:7777/</code>.
+            Largeur/hauteur = celles de ton stream.
           </div>
         </div>
       </div>
 
       <div class="spacer"></div>
-      <div class="sec">Utilisation</div>
-
-      <div class="guide-step">
-        <div class="step-num">▶</div>
-        <div class="step-body">
-          <div class="step-title">Envoyer un mème</div>
-          <div class="step-desc">
-            Dans le salon Discord configuré, <strong>ping l'utilisateur</strong> + envoie un média.<br/>
-            <em>Ex : <strong>@Pseudo</strong> + image / lien TikTok / lien Twitter…</em><br/>
-            <strong>@everyone</strong> fonctionne aussi pour tout le monde.
-          </div>
-        </div>
-      </div>
-
-      <div class="spacer"></div>
-      <div class="sec">Formats supportés</div>
-      <div class="fmt-grid">
-        <span class="fmt-badge">Image JPG / PNG</span>
-        <span class="fmt-badge">GIF animé</span>
-        <span class="fmt-badge">Vidéo MP4 / WebM</span>
-        <span class="fmt-badge">TikTok</span>
-        <span class="fmt-badge">Twitter / X</span>
-        <span class="fmt-badge">Tenor / Giphy</span>
-        <span class="fmt-badge">Texte seul</span>
+      <div class="sec">Plateformes supportées</div>
+      <div class="step-desc" style="line-height:1.8">
+        Discord (attachments + Tenor/Giphy), TikTok, X/Twitter, Streamable, Reddit,
+        liens directs (.jpg .gif .mp4 .webm).
       </div>
 
       <div class="spacer"></div>

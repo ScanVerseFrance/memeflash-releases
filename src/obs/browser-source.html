@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>MemeFlash OBS</title>
+  <style>
+    :root {
+      --color: #57f287;
+      --glow:  rgba(87,242,135,.4);
+      --scale: 1;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    #stage {
+      position: fixed; inset: 0;
+      display: flex;
+      padding: 50px 40px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    #stage.visible { opacity: 1; }
+
+    #stage.top-left     { align-items: flex-start; justify-content: flex-start; }
+    #stage.top          { align-items: flex-start; justify-content: center; }
+    #stage.top-right    { align-items: flex-start; justify-content: flex-end; }
+    #stage.center       { align-items: center;     justify-content: center; }
+    #stage.bottom-left  { align-items: flex-end;   justify-content: flex-start; }
+    #stage.bottom-right { align-items: flex-end;   justify-content: flex-end; }
+
+    #card-wrapper {
+      position: relative;
+      max-width: 440px;
+      width: 100%;
+      padding-top: 30px;
+      transform: scale(var(--scale));
+      transform-origin: top center;
+    }
+
+    .anim-pop   #card-wrapper { animation: pop-in .35s cubic-bezier(.16,1,.3,1) both; }
+    .anim-slide #card-wrapper { animation: slide-in .4s cubic-bezier(.16,1,.3,1) both; }
+    .anim-fade  #card-wrapper { animation: fade-in .4s ease both; }
+
+    @keyframes pop-in   { from{transform:translateY(18px) scale(.92);opacity:0} to{opacity:1} }
+    @keyframes slide-in { from{transform:translateX(40px);opacity:0} to{opacity:1} }
+    @keyframes fade-in  { from{opacity:0} to{opacity:1} }
+
+    #card-author {
+      position: absolute;
+      top: 0; left: 10px;
+      display: flex; align-items: center; gap: 12px;
+      z-index: 20;
+    }
+    #avatar {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: #555;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 900; color: #fff;
+      flex-shrink: 0; text-transform: uppercase;
+      border: 3px solid var(--color);
+      box-shadow: 0 0 0 2px rgba(0,0,0,.55), 0 0 18px var(--glow);
+      overflow: hidden;
+    }
+    .author-text { display: flex; flex-direction: column; line-height: 1.2; }
+    #author-name {
+      font-family: 'Segoe UI Black','Arial Black',Impact,sans-serif;
+      font-size: 19px; font-weight: 900; color: #fff;
+      -webkit-text-stroke: 3px #000;
+      paint-order: stroke fill;
+      text-shadow: 0 2px 10px rgba(0,0,0,.9);
+    }
+    #platform-badge {
+      font-family: 'Segoe UI',system-ui,sans-serif;
+      font-size: 10px; font-weight: 700;
+      color: rgba(255,255,255,.5);
+      text-transform: uppercase; letter-spacing: .08em;
+    }
+
+    #card {
+      position: relative;
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2.5px solid var(--color);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.5), 0 0 26px var(--glow), 0 14px 50px rgba(0,0,0,.85);
+      background: #111;
+    }
+    #media-wrap {
+      width: 100%; max-height: 520px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    #media-wrap img, #media-wrap video {
+      max-width: 100%; max-height: 520px;
+      display: block; object-fit: contain;
+    }
+
+    /* Mode streamer : floute le media (audio reste) */
+    body.streamer #media-wrap img,
+    body.streamer #media-wrap video { filter: blur(28px); }
+    body.streamer-avatars #avatar img { filter: blur(10px); }
+    body.streamer-avatars #avatar { color: transparent; }
+
+    #msg-text {
+      position: absolute;
+      bottom: 3px; left: 0; right: 0;
+      padding: 32px 16px 10px;
+      background: linear-gradient(transparent, rgba(0,0,0,.82));
+      text-align: center;
+      font-family: 'Segoe UI Black','Arial Black',Impact,sans-serif;
+      font-size: 20px; font-weight: 900; color: #fff;
+      -webkit-text-stroke: 2px #000;
+      paint-order: stroke fill;
+      text-shadow: 0 2px 10px rgba(0,0,0,.9);
+      white-space: pre-wrap; word-break: break-word;
+    }
+    #msg-text:empty { display: none; }
+
+    #progress {
+      height: 3px;
+      background: linear-gradient(90deg, var(--color), rgba(255,255,255,.25));
+      transform-origin: left center;
+      transform: scaleX(0);
+    }
+
+    #connection-banner {
+      position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.75); color: #fff; padding: 6px 14px;
+      border-radius: 6px; font-size: 12px; opacity: 0;
+      transition: opacity .3s;
+    }
+    #connection-banner.visible { opacity: 1; }
+  </style>
+</head>
+<body class="anim-pop">
+  <div id="connection-banner">MemeFlash OBS — déconnecté</div>
+
+  <div id="stage" class="top">
+    <div id="card-wrapper">
+      <div id="card-author">
+        <div id="avatar">?</div>
+        <div class="author-text">
+          <span id="author-name">Utilisateur</span>
+          <span id="platform-badge">Discord</span>
+        </div>
+      </div>
+      <div id="card">
+        <div id="media-wrap"></div>
+        <div id="msg-text"></div>
+        <div id="progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const stage     = document.getElementById('stage');
+    const avatar    = document.getElementById('avatar');
+    const authorEl  = document.getElementById('author-name');
+    const msgText   = document.getElementById('msg-text');
+    const mediaWrap = document.getElementById('media-wrap');
+    const progress  = document.getElementById('progress');
+    const platBadge = document.getElementById('platform-badge');
+    const banner    = document.getElementById('connection-banner');
+
+    const PLATFORM_COLORS = {
+      tiktok:  ['#ee1d52', 'rgba(238,29,82,.45)'],
+      twitter: ['#1D9BF0', 'rgba(29,155,240,.45)'],
+    };
+
+    const queue = [];
+    let playing = false;
+    let hideTimer = null;
+
+    function processNext() {
+      if (queue.length === 0) { playing = false; doHide(); return; }
+      playing = true;
+      displayMedia(queue.shift());
+    }
+
+    function displayMedia(d) {
+      clearTimeout(hideTimer);
+      stopMedia();
+      resetProgress();
+
+      const valid = ['top-left','top','top-right','center','bottom-left','bottom-right'];
+      stage.className = valid.includes(d.position) ? d.position : 'top';
+
+      const realName = d.author || 'Utilisateur';
+      authorEl.dataset.realName = realName;
+      authorEl.textContent = window._hideNames ? 'Anonyme' : realName;
+      setAvatar(d.author, d.avatar);
+      msgText.textContent = d.type === 'text' ? '' : (d.text || '');
+
+      const [col, glow] = PLATFORM_COLORS[d.platform] || ['#57f287','rgba(87,242,135,.4)'];
+      document.documentElement.style.setProperty('--color', col);
+      document.documentElement.style.setProperty('--glow',  glow);
+      if (platBadge) {
+        platBadge.textContent = d.platform === 'tiktok' ? 'TikTok'
+          : d.platform === 'twitter' ? 'X / Twitter'
+          : d.platform === 'reddit'  ? 'Reddit'
+          : 'Discord';
+      }
+
+      const imgDur = d.imageDuration ?? 8000;
+      const maxDur = d.maxDuration   ?? 30000;
+
+      if (d.type === 'video')      buildVideo(d.url, d.volume ?? 0.5, maxDur);
+      else if (d.type === 'text')  buildText(d.text, imgDur);
+      else                         buildImage(d.url, imgDur);
+
+      requestAnimationFrame(() => stage.classList.add('visible'));
+    }
+
+    function setAvatar(author, url) {
+      if (url) {
+        const img = document.createElement('img');
+        img.src = url;
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+        img.onerror = () => { avatar.innerHTML=''; avatar.textContent = (author||'?')[0].toUpperCase(); };
+        avatar.innerHTML = ''; avatar.appendChild(img);
+      } else {
+        avatar.innerHTML = ''; avatar.textContent = (author||'?')[0].toUpperCase();
+      }
+    }
+
+    function buildVideo(url, volume, maxDur) {
+      const v = document.createElement('video');
+      v.src = url; v.autoplay = true; v.controls = false; v.loop = false;
+      v.volume = Math.min(1, Math.max(0, volume));
+      const loadT = setTimeout(() => { if (!v._dead) processNext(); }, 10000);
+      v.addEventListener('loadedmetadata', () => {
+        if (v._dead) return;
+        clearTimeout(loadT);
+        const tot = v.duration * 1000;
+        const dis = isFinite(tot) ? Math.min(tot, maxDur) : maxDur;
+        startProgress(dis);
+        if (!isFinite(tot) || tot > maxDur) hideTimer = setTimeout(processNext, maxDur);
+      });
+      v.addEventListener('ended', () => { if (!v._dead) processNext(); });
+      v.addEventListener('error', () => { if (!v._dead) { clearTimeout(loadT); processNext(); } });
+      v.play().catch(() => {
+        v.muted = true;
+        v.play().catch(() => { if (!v._dead) { clearTimeout(loadT); processNext(); } });
+      });
+      mediaWrap.appendChild(v);
+    }
+
+    function buildImage(url, dur) {
+      const img = document.createElement('img');
+      img.src = url; img.onerror = processNext;
+      mediaWrap.appendChild(img);
+      startProgress(dur); hideTimer = setTimeout(processNext, dur);
+    }
+
+    function buildText(text, dur) {
+      const div = document.createElement('div');
+      div.style.cssText = 'width:100%;min-height:110px;display:flex;align-items:center;justify-content:center;padding:36px 24px;text-align:center;font-family:"Segoe UI Black","Arial Black",Impact,sans-serif;font-size:30px;font-weight:900;color:#fff;-webkit-text-stroke:2.5px #000;paint-order:stroke fill;text-shadow:0 2px 12px rgba(0,0,0,.9);white-space:pre-wrap;word-break:break-word;line-height:1.25;';
+      div.textContent = text;
+      mediaWrap.appendChild(div);
+      startProgress(dur); hideTimer = setTimeout(processNext, dur);
+    }
+
+    function startProgress(dur) {
+      resetProgress();
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        progress.style.transition = `transform ${dur}ms linear`;
+        progress.style.transform = 'scaleX(1)';
+      }));
+    }
+    function resetProgress() {
+      progress.style.transition = 'none';
+      progress.style.transform = 'scaleX(0)';
+    }
+
+    function doHide() {
+      clearTimeout(hideTimer);
+      stage.classList.remove('visible');
+      setTimeout(() => { stopMedia(); }, 300);
+    }
+    function stopMedia() {
+      const v = mediaWrap.querySelector('video');
+      if (v) { v._dead = true; v.pause(); v.removeAttribute('src'); v.load(); }
+      mediaWrap.innerHTML = '';
+    }
+
+    // ── Connexion SSE au serveur OBS ─────────────────────────────────────────
+    let es = null;
+    let reconnTimer = null;
+    function connect() {
+      if (es) try { es.close(); } catch (_) {}
+      es = new EventSource('/events');
+      es.addEventListener('hello', () => {
+        banner.classList.remove('visible');
+      });
+      es.addEventListener('show-media', (ev) => {
+        try {
+          const data = JSON.parse(ev.data);
+          queue.push(data);
+          if (!playing) processNext();
+        } catch (_) {}
+      });
+      es.addEventListener('apply-overlay-settings', (ev) => {
+        try {
+          const s = JSON.parse(ev.data);
+          if (s.overlaySize != null) document.documentElement.style.setProperty('--scale', s.overlaySize);
+          if (s.animation) {
+            // Préserve les autres classes (streamer-*) en ne touchant que anim-*
+            document.body.className = document.body.className.replace(/anim-\w+/g, '').trim() + ` anim-${s.animation}`;
+          }
+          if (s.streamerMode != null) {
+            document.body.classList.toggle('streamer', s.streamerMode);
+          }
+          if (s.streamerHideNames != null) {
+            window._hideNames = !!s.streamerHideNames;
+            const el = document.getElementById('author-name');
+            if (el && el.dataset.realName) {
+              el.textContent = s.streamerHideNames ? 'Anonyme' : el.dataset.realName;
+            }
+          }
+          if (s.streamerBlurAvatars != null) {
+            document.body.classList.toggle('streamer-avatars', s.streamerBlurAvatars);
+          }
+        } catch (_) {}
+      });
+      es.onerror = () => {
+        banner.textContent = 'MemeFlash OBS — déconnecté';
+        banner.classList.add('visible');
+        try { es.close(); } catch (_) {}
+        clearTimeout(reconnTimer);
+        reconnTimer = setTimeout(connect, 3000);
+      };
+    }
+    connect();
+  </script>
+</body>
+</html>
