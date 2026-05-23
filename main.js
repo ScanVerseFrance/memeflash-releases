@@ -7,6 +7,7 @@ const Store = require('electron-store');
 const path  = require('path');
 const os    = require('os');
 const fs    = require('fs');
+const { pathToFileURL, fileURLToPath } = require('url');
 
 const store = new Store();
 let mainWindow    = null;
@@ -16,9 +17,21 @@ let tray          = null;
 let forceQuit     = false;
 const mediaHistory = [];
 
+// ─── Single instance lock ─────────────────────────────────────────────────────
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+  process.exit(0);
+}
+app.on('second-instance', () => { showMainWindow(); });
+
+// ─── Helper show/focus main window ───────────────────────────────────────────
+function showMainWindow() {
+  if (mainWindow) { mainWindow.show(); mainWindow.setSkipTaskbar(false); mainWindow.focus(); }
+}
+
 // ─── Migration depuis l'ancienne installation MemeDrop ───────────────────────
 function migrateFromOldInstall() {
-  if (store.has('token')) return;
+  if (store.has('token') || process.platform !== 'win32') return;
   try {
     const oldCfg = path.join(os.homedir(), 'AppData', 'Roaming', 'memedrop', 'config.json');
     if (fs.existsSync(oldCfg)) {
@@ -44,13 +57,17 @@ function isSafeMediaUrl(url) {
 
 // ─── Détection TikTok ─────────────────────────────────────────────────────────
 function isTikTokUrl(url) {
-  return /tiktok\.com\/@[\w.]+\/video\/\d+|vm\.tiktok\.com\/\w+|tiktok\.com\/t\/\w+/.test(url);
+  return /(vm|vt|m)\.tiktok\.com\/\w+|tiktok\.com\/@[\w.]+\/video\/\d+|tiktok\.com\/t\/\w+/.test(url);
 }
 
 async function getTikTokMedia(url) {
   try {
+    const ctrl = new AbortController();
+    const tid  = setTimeout(() => ctrl.abort(), 10000);
     const res  = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`,
-      { headers: { 'User-Agent': 'Mozilla/5.0' } });
+      { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!res.ok) return null;
     const data = await res.json();
     if (data.code === 0 && data.data?.play) {
       // Télécharge dans un fichier temp pour contourner les restrictions CDN TikTok
@@ -65,7 +82,7 @@ async function getTikTokMedia(url) {
         const buf     = Buffer.from(await videoRes.arrayBuffer());
         const tmpFile = path.join(os.tmpdir(), `md_${Date.now()}.mp4`);
         fs.writeFileSync(tmpFile, buf);
-        return { url: `file:///${tmpFile.replace(/\\/g, '/')}`, type: 'video' };
+        return { url: pathToFileURL(tmpFile).toString(), type: 'video' };
       }
     }
   } catch (e) { console.error('[TikTok]', e.message); }
@@ -78,14 +95,23 @@ function isTwitterUrl(url) {
 }
 
 async function getTwitterMedia(url) {
-  try {
-    const apiUrl = url.replace(/^https?:\/\/(www\.)?(twitter|x)\.com/, 'https://api.fxtwitter.com');
-    const res    = await fetch(apiUrl, { headers: { 'User-Agent': 'MemeDrop/1.0' } });
-    const data   = await res.json();
-    const tweet  = data.tweet;
-    if (tweet?.media?.videos?.length)  return { url: tweet.media.videos[0].url,  type: 'video' };
-    if (tweet?.media?.photos?.length)  return { url: tweet.media.photos[0].url,  type: 'image' };
-  } catch (e) { console.error('[Twitter]', e.message); }
+  const apis = [
+    url.replace(/^https?:\/\/(www\.)?(twitter|x)\.com/, 'https://api.fxtwitter.com'),
+    url.replace(/^https?:\/\/(www\.)?(twitter|x)\.com/, 'https://api.vxtwitter.com'),
+  ];
+  for (const apiUrl of apis) {
+    try {
+      const ctrl = new AbortController();
+      const tid  = setTimeout(() => ctrl.abort(), 8000);
+      const res  = await fetch(apiUrl, { headers: { 'User-Agent': 'MemeFlash/1.0' }, signal: ctrl.signal });
+      clearTimeout(tid);
+      if (!res.ok) continue;
+      const data  = await res.json();
+      const tweet = data.tweet;
+      if (tweet?.media?.videos?.length) return { url: tweet.media.videos[0].url, type: 'video' };
+      if (tweet?.media?.photos?.length) return { url: tweet.media.photos[0].url, type: 'image' };
+    } catch (e) { console.error('[Twitter]', apiUrl, e.message); }
+  }
   return null;
 }
 
@@ -112,21 +138,16 @@ function createMainWindow() {
 
 // ─── System tray ──────────────────────────────────────────────────────────────
 function createTray() {
-  const iconPath = path.join(__dirname, 'build', 'icon.ico');
+  const iconPath = path.join(__dirname, 'build', process.platform === 'darwin' ? 'icon.png' : 'icon.ico');
   tray = new Tray(nativeImage.createFromPath(iconPath));
   tray.setToolTip('MemeFlash');
   const menu = Menu.buildFromTemplate([
-    {
-      label: 'Ouvrir MemeFlash',
-      click: () => { if (mainWindow) { mainWindow.show(); mainWindow.setSkipTaskbar(false); mainWindow.focus(); } },
-    },
+    { label: 'Ouvrir MemeFlash', click: showMainWindow },
     { type: 'separator' },
     { label: 'Quitter', click: () => app.quit() },
   ]);
   tray.setContextMenu(menu);
-  tray.on('click', () => {
-    if (mainWindow) { mainWindow.show(); mainWindow.setSkipTaskbar(false); mainWindow.focus(); }
-  });
+  tray.on('click', showMainWindow);
 }
 
 // ─── Fenêtre overlay ──────────────────────────────────────────────────────────
@@ -137,6 +158,7 @@ function createOverlayWindow() {
     x: bounds.x - 5, y: bounds.y - 30,
     transparent: true, frame: false, thickFrame: false, alwaysOnTop: true,
     skipTaskbar: true, hasShadow: false, title: '',
+    show: false,                    // Caché au démarrage, montré seulement quand un média arrive
     backgroundColor: '#00000000',  // Transparent total, évite la barre DWM
     roundedCorners: false,          // Windows 11 : désactive le rendu DWM des coins
     webPreferences: { nodeIntegration: true, contextIsolation: false, backgroundThrottling: false },
@@ -148,10 +170,16 @@ function createOverlayWindow() {
   overlayWindow.setMenuBarVisibility(false);
   overlayWindow.setTitle('');
   overlayWindow.loadFile(path.join(__dirname, 'src/overlay/overlay.html'));
+
+  overlayWindow.webContents.on('render-process-gone', (_event, details) => {
+    console.error('[Overlay] crash :', details.reason);
+    overlayWindow = null;
+    createOverlayWindow();
+  });
 }
 
 // ─── Bot Discord ──────────────────────────────────────────────────────────────
-function startDiscordBot(token, channelId) {
+function startDiscordBot(token, channelIds) {
   if (discordClient) { discordClient.destroy(); discordClient = null; }
 
   discordClient = new Client({
@@ -163,12 +191,13 @@ function startDiscordBot(token, channelId) {
   });
 
   discordClient.once('ready', () => {
-    console.log(`[Bot] Connecté : ${discordClient.user.tag}`);
-    if (mainWindow) mainWindow.webContents.send('bot-status', { connected: true, tag: discordClient.user.tag });
+    console.log(`[Bot] Connecté : ${discordClient.user.tag} | channels: ${channelIds.join(', ')}`);
+    const avatar = discordClient.user.displayAvatarURL({ size: 64, extension: 'png' });
+    if (mainWindow) mainWindow.webContents.send('bot-status', { connected: true, tag: discordClient.user.tag, avatar, channelIds });
   });
 
   discordClient.on('messageCreate', async (message) => {
-    if (message.channelId !== channelId) return;
+    if (!channelIds.includes(message.channelId)) return;
     if (message.author.bot) return;
 
     // ── Ciblage par ping (obligatoire) ───────────────────────────────────
@@ -203,15 +232,19 @@ function startDiscordBot(token, channelId) {
     }
 
     // 2) Embed Discord (Tenor, Giphy…)
+    // Attention : pour Twitter/TikTok, embed.video.url pointe sur l'URL du tweet/tiktok
+    // (pas la vidéo directe). On laisse le step 3 gérer ces cas via leurs extracteurs.
     if (!mediaUrl && message.embeds.length > 0) {
       const embed = message.embeds[0];
-      if (embed.video?.url) {
+      if (embed.video?.url && !isTwitterUrl(embed.video.url) && !isTikTokUrl(embed.video.url)) {
         mediaUrl = embed.video.proxyURL || embed.video.url; mediaType = 'video';
-      } else if (embed.image?.url) {
+      }
+      if (!mediaUrl && embed.image?.url) {
         const u = embed.image.url.toLowerCase();
         mediaUrl = embed.image.proxyURL || embed.image.url;
         mediaType = u.includes('.gif') ? 'gif' : 'image';
-      } else if (embed.thumbnail?.url) {
+      }
+      if (!mediaUrl && embed.thumbnail?.url) {
         mediaUrl = embed.thumbnail.proxyURL || embed.thumbnail.url; mediaType = 'image';
       }
     }
@@ -258,7 +291,10 @@ function startDiscordBot(token, channelId) {
       announceSound: store.get('announceSound', false),
     };
 
-    if (overlayWindow) overlayWindow.webContents.send('show-media', payload);
+    if (overlayWindow) {
+      overlayWindow.showInactive();
+      overlayWindow.webContents.send('show-media', payload);
+    }
 
     mediaHistory.unshift({
       url: mediaUrl, type: mediaType, text,
@@ -283,9 +319,14 @@ function startDiscordBot(token, channelId) {
 
 // ─── IPC ─────────────────────────────────────────────────────────────────────
 ipcMain.on('get-all-settings', (event) => {
+  let channelIds = store.get('channelIds', null);
+  if (!channelIds) {
+    const old = store.get('channelId', '');
+    channelIds = old ? [old] : [];
+  }
   event.reply('all-settings', {
     token:            store.get('token', ''),
-    channelId:        store.get('channelId', ''),
+    channelIds,
     discordUserId:    store.get('discordUserId', ''),
     volume:           store.get('volume', 50),
     imageDuration:    store.get('imageDuration', 8),
@@ -305,9 +346,10 @@ ipcMain.on('save-settings', (_e, s) => {
 
 ipcMain.on('save-credentials', (_e, c) => {
   store.set('token',         c.token);
-  store.set('channelId',     c.channelId);
+  store.set('channelIds',    c.channelIds);
+  store.delete('channelId');
   store.set('discordUserId', c.discordUserId || '');
-  startDiscordBot(c.token, c.channelId);
+  startDiscordBot(c.token, c.channelIds);
 });
 
 ipcMain.on('stop-bot', () => {
@@ -315,7 +357,9 @@ ipcMain.on('stop-bot', () => {
   if (mainWindow) mainWindow.webContents.send('bot-status', { connected: false });
 });
 
-ipcMain.on('overlay-empty', () => { /* opacité gérée par CSS */ });
+ipcMain.on('overlay-empty', () => {
+  if (overlayWindow) overlayWindow.hide();
+});
 
 ipcMain.on('overlay-hover', (_e, hovered) => {
   if (overlayWindow) overlayWindow.setIgnoreMouseEvents(!hovered, { forward: true });
@@ -323,9 +367,8 @@ ipcMain.on('overlay-hover', (_e, hovered) => {
 
 // Supprime les fichiers temp vidéo après lecture
 ipcMain.on('delete-temp', (_e, fileUrl) => {
-  if (!fileUrl?.startsWith('file:///')) return;
-  const filePath = decodeURIComponent(fileUrl.replace('file:///', '')).replace(/\//g, path.sep);
-  fs.unlink(filePath, () => {});
+  if (!fileUrl?.startsWith('file:')) return;
+  try { fs.unlink(fileURLToPath(fileUrl), () => {}); } catch (_) {}
 });
 
 ipcMain.on('test-overlay', () => {
@@ -334,6 +377,7 @@ ipcMain.on('test-overlay', () => {
   const position  = store.get('randomPosition', false)
     ? positions[Math.floor(Math.random() * positions.length)]
     : store.get('selectedPosition', 'top');
+  overlayWindow.showInactive();
   overlayWindow.webContents.send('show-media', {
     url: 'https://media.tenor.com/mCFONcUlBn8AAAAC/cat-typing.gif',
     type: 'gif', text: "Test MemeFlash — l'overlay fonctionne !",
@@ -357,7 +401,7 @@ ipcMain.on('install-update', () => {
 
 // ─── Auto-updater ─────────────────────────────────────────────────────────────
 function setupAutoUpdater() {
-  if (!app.isPackaged) return;
+  if (!app.isPackaged || process.platform === 'darwin') return;
   autoUpdater.autoDownload   = true;
   autoUpdater.autoInstallOnAppQuit = true;
   autoUpdater.on('update-available', (info) => {
@@ -381,10 +425,13 @@ app.whenReady().then(() => {
   createOverlayWindow();
   createTray();
   if (app.isPackaged) {
-    app.setLoginItemSettings({ openAtLogin: true, openAsHidden: false });
+    app.setLoginItemSettings({ openAtLogin: true });
   }
-  const token = store.get('token', ''), channelId = store.get('channelId', '');
-  if (token && channelId) startDiscordBot(token, channelId);
+  app.on('activate', showMainWindow);
+  const token = store.get('token', '');
+  let channelIds = store.get('channelIds', null);
+  if (!channelIds) { const old = store.get('channelId', ''); channelIds = old ? [old] : []; }
+  if (token && channelIds.length) startDiscordBot(token, channelIds);
   setupAutoUpdater();
 });
 

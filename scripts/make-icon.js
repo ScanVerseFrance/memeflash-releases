@@ -43,7 +43,7 @@ const SIDEBAR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 164 31
   <text x="82" y="228" font-family="Arial Black,Arial,sans-serif" font-size="19" font-weight="900" fill="white" text-anchor="middle">MemeFlash</text>
   <text x="82" y="247" font-family="Arial,sans-serif" font-size="11" fill="#e05a28" text-anchor="middle">by MemeCorp</text>
   <!-- Version -->
-  <text x="82" y="295" font-family="Arial,sans-serif" font-size="10" fill="#444" text-anchor="middle">v1.0.6</text>
+  <text x="82" y="295" font-family="Arial,sans-serif" font-size="10" fill="#444" text-anchor="middle">v1.0.13</text>
 </svg>`;
 
 // ── ICO builder (multi-size PNG → .ico) ───────────────────────────────────────
@@ -109,14 +109,18 @@ async function main() {
   const buildDir = path.join(__dirname, '../build');
   if (!fs.existsSync(buildDir)) fs.mkdirSync(buildDir, { recursive: true });
 
-  // App icon
-  const sizes = [256, 128, 64, 48, 32, 16];
-  const pngs  = await Promise.all(sizes.map(s =>
+  // App icon — ICO (Windows)
+  const icoSizes = [256, 128, 64, 48, 32, 16];
+  const icoPngs  = await Promise.all(icoSizes.map(s =>
     sharp(Buffer.from(ICON_SVG), { density: 300 }).resize(s, s).png().toBuffer()
   ));
-  fs.writeFileSync(path.join(buildDir, 'icon.png'), pngs[0]);
-  fs.writeFileSync(path.join(buildDir, 'icon.ico'), buildIco(pngs));
-  console.log('icon.ico written (%d sizes)', sizes.length);
+  fs.writeFileSync(path.join(buildDir, 'icon.ico'), buildIco(icoPngs));
+  console.log('icon.ico written (%d sizes)', icoSizes.length);
+
+  // App icon — PNG 1024×1024 (macOS .icns source via electron-builder)
+  const macPng = await sharp(Buffer.from(ICON_SVG), { density: 300 }).resize(1024, 1024).png().toBuffer();
+  fs.writeFileSync(path.join(buildDir, 'icon.png'), macPng);
+  console.log('icon.png (1024×1024) written');
 
   // Installer header
   const header = await svgToBmp(HEADER_SVG, 150, 57);

@@ -1,6 +1,6 @@
 {
   "name": "memeflash",
-  "version": "1.0.6",
+  "version": "1.0.13",
   "description": "Affiche les mèmes Discord en overlay pendant tes parties",
   "author": "MemeCorp",
   "main": "main.js",
@@ -8,7 +8,8 @@
     "start": "electron .",
     "make-icon": "node scripts/make-icon.js",
     "build": "npm run make-icon && electron-builder --win --x64",
-    "release": "npm run make-icon && electron-builder --win --x64 --publish always"
+    "release": "npm run make-icon && electron-builder --win --x64 --publish always",
+    "release-mac": "npm run make-icon && electron-builder --mac --publish always"
   },
   "dependencies": {
     "discord.js": "^14.18.0",
@@ -24,7 +25,6 @@
     "appId": "com.memecorp.memeflash",
     "productName": "MemeFlash",
     "copyright": "Copyright © 2025 MemeCorp",
-    "icon": "build/icon.ico",
     "directories": { "output": "dist" },
     "publish": [{
       "provider": "github",
@@ -32,6 +32,7 @@
       "repo": "memeflash-releases"
     }],
     "win": {
+      "icon": "build/icon.ico",
       "target": [{ "target": "nsis", "arch": ["x64"] }]
     },
     "nsis": {
@@ -44,6 +45,11 @@
       "include": "build/installer.nsh",
       "installerHeader": "build/header.bmp",
       "installerSidebar": "build/sidebar.bmp"
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.utilities",
+      "target": [{ "target": "dmg", "arch": ["universal"] }]
     },
     "files": [
       "main.js",

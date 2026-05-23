@@ -17,12 +17,14 @@ const volCtrl   = document.getElementById('vol-ctrl');
 const queue   = [];
 let playing   = false;
 let hideTimer = null;
+let emptyTimer = null;
 let paused    = false;
 
 const PAUSE_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
 const PLAY_SVG  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
 
 ipcRenderer.on('show-media', (_e, data) => {
+  if (emptyTimer) { clearTimeout(emptyTimer); emptyTimer = null; }
   queue.push(data);
   updateBadge();
   if (!playing) processNext();
@@ -32,7 +34,6 @@ function processNext() {
   if (queue.length === 0) {
     playing = false;
     doHide();
-    ipcRenderer.send('overlay-empty');
     return;
   }
   playing = true;
@@ -251,7 +252,11 @@ function doHide() {
   clearTimeout(hideTimer);
   stage.classList.remove('visible');
   resetProgress();
-  setTimeout(stopMedia, 280);
+  emptyTimer = setTimeout(() => {
+    emptyTimer = null;
+    stopMedia();
+    ipcRenderer.send('overlay-empty');
+  }, 300);
 }
 
 function stopMedia() {

@@ -50,6 +50,7 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 20px; font-weight: 700; color: #fff;
       flex-shrink: 0;
+      overflow: hidden;
     }
 
     .user-info { flex: 1; min-width: 0; }
@@ -223,6 +224,15 @@
     }
     .field input:focus { border-color: var(--accent); }
     .field-row-btn { display: flex; gap: 8px; margin-top: 4px; }
+    .channel-entry { display: flex; gap: 6px; margin-bottom: 6px; }
+    .channel-entry input { flex: 1; }
+    .btn-remove-ch {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); border-radius: var(--radius);
+      width: 34px; font-size: 18px; line-height: 1; cursor: pointer;
+      transition: all .15s; flex-shrink: 0;
+    }
+    .btn-remove-ch:hover { border-color: #e74c3c; color: #e74c3c; }
     .btn-sm {
       flex: 1; padding: 8px; background: transparent;
       border: 1px solid var(--border); border-radius: var(--radius);
@@ -395,7 +405,7 @@
     <div class="save-area">
       <button class="btn-save" id="btn-save">Sauvegarder</button>
     </div>
-    <div class="footer">MemeFlash by MemeCorp — v1.0.6</div>
+    <div class="footer">MemeFlash by MemeCorp — v1.0.13</div>
   </div>
 
   <!-- ═══ PAGE : COMMANDES ═══════════════════════════════ -->
@@ -512,8 +522,9 @@
       </div>
 
       <div class="field">
-        <label>Channel ID</label>
-        <input type="text" id="ac-channel" placeholder="000000000000000000" />
+        <label>Channel ID(s)</label>
+        <div id="channel-list"></div>
+        <button class="btn-sm" id="btn-add-channel" style="margin-top:8px;width:100%;">+ Ajouter un salon</button>
       </div>
 
       <div class="field">
@@ -528,7 +539,7 @@
         </button>
       </div>
     </div>
-    <div class="footer">MemeFlash by MemeCorp — v1.0.6</div>
+    <div class="footer">MemeFlash by MemeCorp — v1.0.13</div>
   </div>
 
   <!-- ═══ PAGE : AIDE ═══════════════════════════════════════ -->

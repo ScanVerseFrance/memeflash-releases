@@ -19,10 +19,11 @@ const chkRandom  = document.getElementById('chk-random');
 const posGrid    = document.getElementById('pos-grid');
 const btnSave    = document.getElementById('btn-save');
 
-const acToken     = document.getElementById('ac-token');
-const acChannel   = document.getElementById('ac-channel');
-const acDiscordId = document.getElementById('ac-discord-id');
-const btnConnect  = document.getElementById('btn-connect');
+const acToken      = document.getElementById('ac-token');
+const acDiscordId  = document.getElementById('ac-discord-id');
+const btnConnect   = document.getElementById('btn-connect');
+const channelList  = document.getElementById('channel-list');
+const btnAddCh     = document.getElementById('btn-add-channel');
 const btnShowTok  = document.getElementById('btn-show-token');
 const btnTest     = document.getElementById('btn-test');
 const sdot        = document.getElementById('sdot');
@@ -66,9 +67,12 @@ ipcRenderer.on('all-settings', (_e, s) => {
   setActivePos(s.selectedPosition ?? 'top');
 
   acToken.value   = s.token     ?? '';
-  acChannel.value = s.channelId ?? '';
   if (acDiscordId) acDiscordId.value = s.discordUserId ?? '';
-  channelDisplay.textContent = s.channelId ? `#${s.channelId}` : '—';
+  channelList.innerHTML = '';
+  const ids = s.channelIds?.length ? s.channelIds : [];
+  if (ids.length) ids.forEach(id => addChannelEntry(id));
+  else addChannelEntry();
+  updateChannelDisplay();
 
   if (s.token) {
     tokenPreview.textContent = `Token : ${s.token.slice(0, 10)}••••••••••`;
@@ -144,19 +148,51 @@ btnShowTok.addEventListener('click', () => {
 // ─── Test overlay ─────────────────────────────────────────────────────────────
 btnTest.addEventListener('click', () => ipcRenderer.send('test-overlay'));
 
+// ─── Gestion liste channels ───────────────────────────────────────────────────
+function addChannelEntry(value = '') {
+  const entry = document.createElement('div');
+  entry.className = 'channel-entry';
+  const input = document.createElement('input');
+  input.type = 'text'; input.className = 'channel-id-input';
+  input.placeholder = '000000000000000000'; input.value = value;
+  input.addEventListener('input', updateChannelDisplay);
+  const btn = document.createElement('button');
+  btn.className = 'btn-remove-ch'; btn.title = 'Supprimer'; btn.textContent = '×';
+  btn.addEventListener('click', () => {
+    if (channelList.children.length > 1) { entry.remove(); updateChannelDisplay(); }
+  });
+  entry.appendChild(input); entry.appendChild(btn);
+  channelList.appendChild(entry);
+}
+
+function getChannelIds() {
+  return [...channelList.querySelectorAll('.channel-id-input')]
+    .map(i => i.value.replace(/\D/g, ''))   // uniquement chiffres (Discord snowflake)
+    .filter(id => id.length >= 15);          // ID Discord = 17-19 chiffres minimum
+}
+
+function updateChannelDisplay() {
+  const ids = getChannelIds();
+  if (!ids.length) channelDisplay.textContent = '—';
+  else if (ids.length === 1) channelDisplay.textContent = `#${ids[0]}`;
+  else channelDisplay.textContent = `${ids.length} salons`;
+}
+
+btnAddCh.addEventListener('click', () => addChannelEntry());
+
 // ─── Connexion depuis onglet Compte ───────────────────────────────────────────
 btnConnect.addEventListener('click', () => {
-  const token     = acToken.value.trim();
-  const channelId = acChannel.value.trim();
-  if (!token || !channelId) {
-    setStatus('Remplis le token et le Channel ID !', 'error');
+  const token      = acToken.value.trim();
+  const channelIds = getChannelIds();
+  if (!token || !channelIds.length) {
+    setStatus('Token ou Channel ID invalide (ex : 1234567890123456789)', 'error');
     return;
   }
   setStatus('Connexion en cours…', 'loading');
   btnConnect.disabled = true;
   ipcRenderer.send('save-credentials', {
     token,
-    channelId,
+    channelIds,
     discordUserId: acDiscordId ? acDiscordId.value.trim() : '',
   });
 });
@@ -167,8 +203,10 @@ ipcRenderer.on('bot-status', (_e, s) => {
   if (s.connected) {
     setStatus(`Connecté : ${s.tag}`, 'online');
     usernameEl.textContent = s.tag;
-    avatarEl.textContent   = s.tag[0].toUpperCase();
-    channelDisplay.textContent = `#${acChannel.value || '—'}`;
+    setAvatar(s.avatar, s.tag);
+    if (s.channelIds?.length === 1) channelDisplay.textContent = `#${s.channelIds[0]}`;
+    else if (s.channelIds?.length > 1) channelDisplay.textContent = `${s.channelIds.length} salons actifs`;
+    else updateChannelDisplay();
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelector('[data-tab="settings"]').classList.add('active');
@@ -176,9 +214,23 @@ ipcRenderer.on('bot-status', (_e, s) => {
   } else {
     setStatus(s.error || 'Déconnecté', 'error');
     usernameEl.textContent = 'Non connecté';
-    avatarEl.textContent   = '?';
+    avatarEl.innerHTML = '';
+    avatarEl.textContent = '?';
   }
 });
+
+function setAvatar(url, tag) {
+  avatarEl.innerHTML = '';
+  if (url) {
+    const img = document.createElement('img');
+    img.src   = url;
+    img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;';
+    img.onerror = () => { avatarEl.innerHTML = ''; avatarEl.textContent = tag ? tag[0].toUpperCase() : '?'; };
+    avatarEl.appendChild(img);
+  } else {
+    avatarEl.textContent = tag ? tag[0].toUpperCase() : '?';
+  }
+}
 
 function setStatus(text, state) {
   statusText.textContent = text;
